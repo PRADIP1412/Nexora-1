@@ -1,0 +1,57 @@
+import React, { useState } from 'react';
+import './SubcategoryCard.css';
+
+const SubcategoryCard = ({ subcategory, onEdit, onDelete }) => {
+    const [showActions, setShowActions] = useState(false);
+
+    return (
+        <div className="subcategory-card">
+            <div className="subcategory-content">
+                <div className="subcategory-header">
+                    <div className="subcategory-icon">
+                        <i className="fas fa-folder-open"></i>
+                    </div>
+                    <div className="subcategory-info">
+                        <h4 className="subcategory-name">
+                            {subcategory.sub_category_name}
+                            <span className="subcategory-id">ID: {subcategory.sub_category_id}</span>
+                        </h4>
+                        {subcategory.description && (
+                            <p className="subcategory-description">
+                                {subcategory.description.length > 100 
+                                    ? `${subcategory.description.substring(0, 100)}...`
+                                    : subcategory.description}
+                            </p>
+                        )}
+                    </div>
+                </div>
+                
+                <div className="subcategory-meta">
+                    <span className="meta-item">
+                        <i className="fas fa-folder"></i>
+                        Parent ID: {subcategory.category_id}
+                    </span>
+                </div>
+            </div>
+            
+            <div className="subcategory-actions">
+                <button 
+                    className="action-btn edit-btn"
+                    onClick={onEdit}
+                    title="Edit Subcategory"
+                >
+                    <i className="fas fa-edit"></i>
+                </button>
+                <button 
+                    className="action-btn delete-btn"
+                    onClick={onDelete}
+                    title="Delete Subcategory"
+                >
+                    <i className="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    );
+};
+
+export default SubcategoryCard;

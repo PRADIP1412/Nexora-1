@@ -1,0 +1,17 @@
+from sqlalchemy import Column, Integer, String, ForeignKey, DECIMAL, TIMESTAMP, func
+from sqlalchemy.orm import relationship
+from config.database import Base
+
+class DeliveryPerson(Base):
+    __tablename__ = "delivery_person"
+
+    delivery_person_id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("user.user_id", ondelete="CASCADE"))
+    license_number = Column(String(100))
+    status = Column(String(50), default="ACTIVE")
+    rating = Column(DECIMAL(3, 2), default=0.0)
+    joined_at = Column(TIMESTAMP, server_default=func.now())
+
+    user = relationship("User")
+    deliveries = relationship("Delivery", back_populates="delivery_person")
+    earnings = relationship("DeliveryEarnings", back_populates="delivery_person")
