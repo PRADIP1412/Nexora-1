@@ -33,11 +33,33 @@ from routes import (
     return_routes,
     refund_routes,
     notification_routes,
+    notification_admin_routes,
     analytics_routes,
     feedback_routes,
     address_routes,
     checkout_routes,
-    dashboard_routes
+    dashboard_routes,
+    customer_routes,
+    order_admin_routes,
+    delivery_admin_routes,
+    reports_routes,
+    system_routes
+)
+
+from routes.delivery_panel import (
+    delivery_dashboard_routes,
+    delivery_active_routes,
+    delivery_pickup_routes,
+    delivery_completed_routes,
+    delivery_earnings_routes,
+    # delivery_route_map_routes,
+    delivery_performance_routes,
+    delivery_schedule_routes,
+    delivery_vehicle_routes,
+    delivery_profile_routes,
+    delivery_support_routes,
+    delivery_reports_routes,
+    delivery_available_route
 )
 
 from routes import (
@@ -174,6 +196,31 @@ def test_db_insert(db: Session = Depends(get_db)):
 
 # --- Include all routers ---
 app.include_router(auth_routes.router)
+# app.include_router(delivery_route_map_routes.router)
+app.include_router(notification_routes.router)
+
+# Delivery Panel Routes
+app.include_router(delivery_available_route.router)
+app.include_router(delivery_reports_routes.router)
+app.include_router(delivery_support_routes.router)
+app.include_router(delivery_profile_routes.router)
+app.include_router(delivery_vehicle_routes.router)
+app.include_router(delivery_performance_routes.router)
+app.include_router(delivery_schedule_routes.router)
+app.include_router(delivery_earnings_routes.router)
+app.include_router(delivery_completed_routes.router)
+app.include_router(delivery_pickup_routes.router)
+app.include_router(delivery_dashboard_routes.router)
+app.include_router(delivery_active_routes.router)
+
+app.include_router(delivery_routes.router)
+# all continued
+# app.include_router(delivery_admin_routes.router)
+app.include_router(system_routes.router)
+app.include_router(reports_routes.router)
+# app.include_router(notification_admin_routes.router)
+app.include_router(order_admin_routes.router)
+app.include_router(customer_routes.router)
 app.include_router(user_routes.router)
 app.include_router(role_routes.router)
 app.include_router(permission_routes.router)
@@ -184,12 +231,10 @@ app.include_router(review_routes.router)
 app.include_router(profile_routes.router)
 app.include_router(account_routes.router)
 app.include_router(order_routes.router)
-app.include_router(delivery_routes.router)
 app.include_router(payment_routes.router)
 app.include_router(delivery_person_routes.router)
 app.include_router(return_routes.router)
 app.include_router(refund_routes.router)
-app.include_router(notification_routes.router)
 app.include_router(analytics_routes.router)
 app.include_router(feedback_routes.router)
 app.include_router(address_routes.router)

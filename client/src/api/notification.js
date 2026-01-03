@@ -8,7 +8,7 @@ export const notificationAPI = {
     try {
       const params = { skip, limit };
       if (isRead !== null) params.is_read = isRead;
-      
+      console.log('Notification API - getUserNotifications:', params);
       const response = await api.get(NOTIFICATION_BASE_URL + '/', { params });
       return { success: true, data: response.data };
     } catch (error) {

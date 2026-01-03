@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useOffer } from '../../context/OfferContext';
+import { useOfferContext } from '../../context/OfferContext';
 import OfferCard from './OfferCard';
 import './OfferList.css';
 
 const OfferList = ({ offers = [], onOfferSelect, emptyMessage = 'No offers available', showFilters = true }) => {
-  const { isLoading } = useOffer();
+  const { loading } = useOfferContext();
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   
@@ -41,7 +41,7 @@ const OfferList = ({ offers = [], onOfferSelect, emptyMessage = 'No offers avail
     }
   };
   
-  if (isLoading && offers.length === 0) {
+  if (loading && offers.length === 0) {
     return (
       <div className="offer-list-loading">
         <div className="loading-spinner"></div>

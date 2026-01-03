@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DECIMAL, TIMESTAMP, func
+from sqlalchemy import Column, Integer, String, ForeignKey, DECIMAL, TIMESTAMP, func, Boolean, JSON
 from sqlalchemy.orm import relationship
 from config.database import Base
 
@@ -11,6 +11,10 @@ class DeliveryPerson(Base):
     status = Column(String(50), default="ACTIVE")
     rating = Column(DECIMAL(3, 2), default=0.0)
     joined_at = Column(TIMESTAMP, server_default=func.now())
+    is_online = Column(Boolean, default=False)  # For status toggle
+    current_location = Column(JSON)  # For map: {lat: xx, lng: xx}
+    vehicle_info = Column(JSON)  # {type: "bike", number: "GJ01AB1234", insurance: "2025-12-31"}
+    documents = Column(JSON)  # {aadhaar: "url", license: "url", pan: "url"}
 
     user = relationship("User")
     deliveries = relationship("Delivery", back_populates="delivery_person")

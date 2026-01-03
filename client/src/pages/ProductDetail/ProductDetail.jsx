@@ -4,15 +4,15 @@ import ProductCard from '../../components/ProductCard/ProductCard';
 import { fetchProductDetail, fetchProductReviews, createProductReview, fetchProducts } from '../../api/product';
 import { useAuth } from '../../context/AuthContext';
 import './ProductDetail.css';
-import { useCart } from "../../context/CartContext";
-import { useWishlist } from "../../context/WishlistContext";
+import { useCartContext } from "../../context/CartContext"; // Changed from useCart
+import { useWishlistContext } from "../../context/WishlistContext"; // Changed from useWishlist
 import { toastSuccess, toastError } from "../../utils/customToast";
 
 const ProductDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { addItemToCart } = useCart();
-    const { addItemToWishlist, removeItemFromWishlist, isInWishlist } = useWishlist();
+    const { addItemToCart } = useCartContext(); // Changed to useCartContext
+    const { addItemToWishlist, removeItemFromWishlist, isInWishlist } = useWishlistContext(); // Changed to useWishlistContext
     const { isAuthenticated, user } = useAuth();
     
     console.log('🔍 PRODUCT DETAIL PARAMS:', { id, params: useParams() });

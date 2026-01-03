@@ -1,76 +1,184 @@
-// src/context/AccountContext.jsx
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { accountAPI } from '../api/account';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import * as accountApi from '../api/account';
 import { useAuth } from './AuthContext';
 
 const AccountContext = createContext();
 
-export const useAccount = () => {
+export const useAccountContext = () => {
     const context = useContext(AccountContext);
     if (!context) {
-        throw new Error('useAccount must be used within a AccountProvider');
+        throw new Error('useAccountContext must be used within AccountProvider');
     }
     return context;
 };
 
 export const AccountProvider = ({ children }) => {
-    const { isAuthenticated, serverStatus = 'online', logout, user } = useAuth();
+    // Auth context
+    const { isAuthenticated, serverStatus, logout, user } = useAuth();
+    
+    // State
     const [dashboard, setDashboard] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [operationLogs, setOperationLogs] = useState([]);
 
+    // Check if user is admin or delivery
     const isAdminUser = !!(user && Array.isArray(user.roles) && user.roles.includes('admin'));
+    const isDeliveryUser = !!(user && Array.isArray(user.roles) && user.roles.includes('delivery'));
 
-    const fetchDashboard = async () => {
-        // Skip customer account fetch for admin users
-        if (isAdminUser) {
-            console.log('Account: Skipping account dashboard fetch for admin user');
-            return;
+    // Utility function to add logs
+    const addLog = useCallback((message, type = 'info') => {
+        const log = {
+            message,
+            type,
+            timestamp: new Date().toLocaleTimeString()
+        };
+        setOperationLogs(prev => [log, ...prev.slice(0, 49)]); // Keep last 50 logs
+    }, []);
+
+    // Clear error
+    const clearError = useCallback(() => setError(null), []);
+
+    // Clear all data
+    const clearAllData = useCallback(() => {
+        setDashboard(null);
+        setOperationLogs([]);
+        setError(null);
+        addLog('All account data cleared', 'info');
+    }, [addLog]);
+
+    // Clear operation logs
+    const clearOperationLogs = useCallback(() => {
+        setOperationLogs([]);
+        addLog('Account operation logs cleared', 'info');
+    }, [addLog]);
+
+    // ===== FETCH DASHBOARD =====
+    const fetchDashboard = useCallback(async () => {
+        // Skip if not authenticated or server is offline
+        if (!isAuthenticated || serverStatus !== 'online') {
+            addLog('Skipping dashboard fetch: Not authenticated or server offline', 'warning');
+            return { success: false, message: 'Not authenticated or server offline' };
         }
 
-        // Only fetch if user is authenticated and server is online
-        if (!isAuthenticated || serverStatus !== 'online') {
-            console.log('Account: Skipping dashboard fetch - not authenticated or server offline');
-            return;
+        // Skip for admin or delivery users
+        if (isAdminUser || isDeliveryUser) {
+            addLog('Skipping customer dashboard fetch for admin/delivery user', 'info');
+            return { success: false, message: 'Not a customer account' };
         }
 
         setLoading(true);
         setError(null);
+        addLog('Fetching account dashboard...', 'info');
+        
         try {
-            console.log('Account: Fetching dashboard data');
-            const response = await accountAPI.getDashboard();
-            // accountAPI should return { success, message, data } or axios response
-            const data = response.data || response;
-            const payload = data?.data ?? data;
-            setDashboard(payload);
+            const result = await accountApi.fetchDashboard();
+            if (result.success) {
+                const dashboardData = result.data?.data ?? result.data;
+                setDashboard(dashboardData);
+                addLog('✅ Account dashboard fetched successfully', 'success');
+                return { success: true, data: dashboardData };
+            } else {
+                setError(result.message);
+                addLog(`❌ Failed to fetch dashboard: ${result.message}`, 'error');
+                return { success: false, message: result.message };
+            }
         } catch (err) {
             const status = err.response?.status;
-            const errorMsg = err.response?.data?.detail || 'Failed to fetch account dashboard';
-            setError(errorMsg);
-            console.error('Account: Error fetching dashboard:', err);
+            let errorMsg = 'Failed to fetch dashboard data';
 
-            // For customers, if it's an auth error, trigger logout
-            if (!isAdminUser && (status === 401 || status === 403)) {
-                console.log('Account: Auth error detected for customer, logging out');
-                logout();
-            } else {
-                // For admin or other non-auth issues, do not logout automatically
-                console.warn('Account: Fetch failed but not logging out (role or non-auth error).', status);
+            // Handle 404 error specifically
+            if (status === 404) {
+                errorMsg = 'Dashboard endpoint not found';
+                addLog(`❌ ${errorMsg}`, 'error');
+                return { success: false, message: errorMsg };
             }
+
+            // Handle 401/403 errors - use logout for 404 as requested
+            if (status === 401 || status === 403) {
+                errorMsg = 'Authentication failed';
+                addLog(`❌ ${errorMsg}, logging out...`, 'error');
+                logout();
+                return { success: false, message: errorMsg };
+            }
+
+            setError(errorMsg);
+            addLog(`❌ ${errorMsg}: ${err.message}`, 'error');
+            console.error('Fetch dashboard error:', err);
+            return { success: false, message: errorMsg };
         } finally {
             setLoading(false);
         }
-    };
+    }, [isAuthenticated, serverStatus, isAdminUser, isDeliveryUser, logout, addLog]);
 
+    // ===== FETCH DASHBOARD TEST =====
+    const fetchDashboardTest = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        addLog('Fetching dashboard test data...', 'info');
+        
+        try {
+            const result = await accountApi.fetchDashboardTest();
+            if (result.success) {
+                const dashboardData = result.data?.data ?? result.data;
+                addLog('✅ Dashboard test data fetched successfully', 'success');
+                return { success: true, data: dashboardData };
+            } else {
+                setError(result.message);
+                addLog(`❌ Failed to fetch dashboard test: ${result.message}`, 'error');
+                return { success: false, message: result.message };
+            }
+        } catch (err) {
+            const status = err.response?.status;
+            let errorMsg = 'Failed to fetch dashboard test data';
+
+            // Handle 404 error specifically
+            if (status === 404) {
+                errorMsg = 'Dashboard test endpoint not found';
+                addLog(`❌ ${errorMsg}`, 'error');
+                return { success: false, message: errorMsg };
+            }
+
+            // Handle 401/403 errors - use logout for 404 as requested
+            if (status === 401 || status === 403) {
+                errorMsg = 'Authentication failed';
+                addLog(`❌ ${errorMsg}, logging out...`, 'error');
+                logout();
+                return { success: false, message: errorMsg };
+            }
+
+            setError(errorMsg);
+            addLog(`❌ ${errorMsg}: ${err.message}`, 'error');
+            console.error('Fetch dashboard test error:', err);
+            return { success: false, message: errorMsg };
+        } finally {
+            setLoading(false);
+        }
+    }, [logout, addLog]);
+
+    // Auto-fetch dashboard on mount when authenticated
     useEffect(() => {
-        fetchDashboard();
-    }, [isAuthenticated, serverStatus]);
+        if (isAuthenticated && serverStatus === 'online') {
+            fetchDashboard();
+        }
+    }, [isAuthenticated, serverStatus, fetchDashboard]);
 
     const value = {
+        // State
         dashboard,
         loading,
         error,
-        refetchDashboard: fetchDashboard
+        operationLogs,
+        
+        // Fetch Functions
+        fetchDashboard,
+        fetchDashboardTest,
+        
+        // Utility Functions
+        clearError,
+        clearAllData,
+        clearOperationLogs,
+        addLog
     };
 
     return (

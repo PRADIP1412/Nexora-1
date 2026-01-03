@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useCoupon } from '../../context/CouponContext';
+import { useCouponContext } from '../../context/CouponContext';
 import CouponList from '../../components/Coupon/CouponList';
 import './CouponsPage.css';
 
@@ -12,14 +12,15 @@ const CouponsPage = () => {
     activeCoupons, 
     allCoupons, 
     couponStats,
-    loadAllCoupons,
-    isLoading,
+    fetchAllCoupons,
+    loading,
     error,
     deleteExistingCoupon,
     updateCouponActiveStatus,
     createNewCoupon,
-    updateExistingCoupon
-  } = useCoupon();
+    updateExistingCoupon,
+    fetchActiveCoupons
+  } = useCouponContext();
   
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -28,9 +29,11 @@ const CouponsPage = () => {
 
   useEffect(() => {
     if (isAdmin) {
-      loadAllCoupons();
+      fetchAllCoupons();
+    } else {
+      fetchActiveCoupons();
     }
-  }, [isAdmin, loadAllCoupons]);
+  }, [isAdmin, fetchAllCoupons, fetchActiveCoupons]);
 
   const handleCouponAction = async (action, coupon) => {
     switch (action) {
@@ -99,11 +102,11 @@ const CouponsPage = () => {
           </div>
         )}
 
-        {error && !isLoading && (
+        {error && !loading && (
           <div className="error-alert">
             <i className="fas fa-exclamation-triangle"></i>
             {error}
-            <button className="retry-btn" onClick={() => loadAllCoupons()}>
+            <button className="retry-btn" onClick={() => isAdmin ? fetchAllCoupons() : fetchActiveCoupons()}>
               Retry
             </button>
           </div>
@@ -171,7 +174,7 @@ const CouponsPage = () => {
         )}
 
         <div className="coupons-section">
-          {isLoading && allCoupons.length === 0 ? (
+          {loading && allCoupons.length === 0 && activeCoupons.length === 0 ? (
             <div className="loading-container">
               <div className="loading-spinner-large"></div>
               <p>Loading coupons...</p>

@@ -8,6 +8,7 @@ class NotificationType(enum.Enum):
     ORDER = "ORDER"
     PAYMENT = "PAYMENT"
     DELIVERY = "DELIVERY"
+    DELIVERY_OFFER = "DELIVERY_OFFER"
     OFFER = "OFFER"
     FEEDBACK = "FEEDBACK"
     SYSTEM = "SYSTEM"

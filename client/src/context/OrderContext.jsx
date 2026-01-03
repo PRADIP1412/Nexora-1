@@ -1,255 +1,410 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { orderAPI } from '../api/order';
+import * as orderApi from '../api/order';
 
 const OrderContext = createContext();
 
-export const useOrder = () => {
-  const context = useContext(OrderContext);
-  if (!context) {
-    throw new Error('useOrder must be used within an OrderProvider');
-  }
-  return context;
+export const useOrderContext = () => {
+    const context = useContext(OrderContext);
+    if (!context) {
+        throw new Error('useOrderContext must be used within OrderProvider');
+    }
+    return context;
 };
 
 export const OrderProvider = ({ children }) => {
-  const [orders, setOrders] = useState([]);
-  const [currentOrder, setCurrentOrder] = useState(null);
-  
-  // Separate loading states for different operations
-  const [loading, setLoading] = useState({
-    orders: false,
-    order: false,
-    create: false,
-    cancel: false,
-    return: false
-  });
-  
-  const [error, setError] = useState(null);
+    // State
+    const [orders, setOrders] = useState([]);
+    const [currentOrder, setCurrentOrder] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [operationLogs, setOperationLogs] = useState([]);
 
-  // Clear error
-  const clearError = () => setError(null);
+    // Utility function to add logs
+    const addLog = useCallback((message, type = 'info') => {
+        const log = {
+            message,
+            type,
+            timestamp: new Date().toLocaleTimeString()
+        };
+        setOperationLogs(prev => [log, ...prev.slice(0, 49)]); // Keep last 50 logs
+    }, []);
 
-  // Get order by ID - FIXED VERSION
-  const getOrderById = useCallback(async (orderId) => {
-    // Reset current order first
-    setCurrentOrder(null);
-    setError(null);
-    
-    // Set loading to true
-    setLoading(prev => ({ ...prev, order: true }));
-    
-    try {
-      console.log(`🔍 OrderContext: Fetching order with ID: ${orderId}`);
-      
-      const result = await orderAPI.getOrderById(orderId);
-      
-      if (result.success) {
-        console.log('✅ OrderContext: Order fetched successfully:', result.data);
-        setCurrentOrder(result.data);
-        setError(null); // Clear any previous errors
-        return { 
-          success: true, 
-          data: result.data,
-          isMock: result.isMock 
-        };
-      } else {
-        console.error('❌ OrderContext: Failed to fetch order:', result.message);
-        setError(result.message);
-        setCurrentOrder(null); // Ensure currentOrder is null on error
-        return { 
-          success: false, 
-          message: result.message 
-        };
-      }
-    } catch (err) {
-      console.error('🔥 OrderContext: Unexpected error in getOrderById:', err);
-      const message = err.message || 'Failed to fetch order details';
-      setError(message);
-      setCurrentOrder(null); // Ensure currentOrder is null on error
-      return { 
-        success: false, 
-        message 
-      };
-    } finally {
-      // Always set loading to false after operation
-      setLoading(prev => ({ ...prev, order: false }));
-    }
-  }, []);
+    // Clear error
+    const clearError = useCallback(() => setError(null), []);
 
-  // ========== KEEP ALL OTHER FUNCTIONS EXACTLY AS THEY ARE ==========
-  
-  // Create order - IMPROVED VERSION (UNCHANGED)
-  const createOrder = useCallback(async (orderData) => {
-    setLoading(prev => ({ ...prev, create: true }));
-    setError(null);
-    try {
-      console.log('OrderContext: Creating order with data:', orderData);
-      
-      const result = await orderAPI.createOrder(orderData);
-      
-      if (result.success) {
-        console.log('OrderContext: Order created successfully:', result.data);
-        setOrders(prev => [result.data, ...prev]);
-        setCurrentOrder(result.data);
-        return { 
-          success: true, 
-          data: result.data, 
-          message: result.message 
-        };
-      } else {
-        console.error('OrderContext: Order creation failed:', result.message);
+    // Clear all data
+    const clearAllData = useCallback(() => {
+        setOrders([]);
+        setCurrentOrder(null);
+        setOperationLogs([]);
+        setError(null);
+        addLog('All order data cleared', 'info');
+    }, [addLog]);
+
+    // Clear operation logs
+    const clearOperationLogs = useCallback(() => {
+        setOperationLogs([]);
+        addLog('Order operation logs cleared', 'info');
+    }, [addLog]);
+
+    // Clear current order
+    const clearCurrentOrder = useCallback(() => {
+        setCurrentOrder(null);
+        addLog('Current order cleared', 'info');
+    }, [addLog]);
+
+    // ===== CREATE ORDER =====
+    const createOrder = useCallback(async (orderData) => {
+        setLoading(true);
+        setError(null);
+        addLog('Creating new order...', 'info');
         
-        // Enhanced error handling
-        let errorMessage = result.message;
-        
-        // Handle specific error cases
-        if (result.validationErrors && result.validationErrors.length > 0) {
-          errorMessage = `Validation errors: ${result.validationErrors.join(', ')}`;
+        try {
+            console.log('OrderContext: Creating order with data:', orderData);
+            
+            const result = await orderApi.createOrder(orderData);
+            
+            if (result.success) {
+                setOrders(prev => [result.data, ...prev]);
+                setCurrentOrder(result.data);
+                addLog('✅ Order created successfully', 'success');
+                return { 
+                    success: true, 
+                    data: result.data, 
+                    message: result.message 
+                };
+            } else {
+                // Enhanced error handling
+                let errorMessage = result.message;
+                
+                if (result.validationErrors && result.validationErrors.length > 0) {
+                    errorMessage = `Validation errors: ${result.validationErrors.join(', ')}`;
+                }
+                
+                setError(errorMessage);
+                addLog(`❌ Failed to create order: ${errorMessage}`, 'error');
+                return { 
+                    success: false, 
+                    message: errorMessage,
+                    validationErrors: result.validationErrors || []
+                };
+            }
+        } catch (err) {
+            const status = err.response?.status;
+            let errorMsg = 'An unexpected error occurred while creating your order';
+
+            // Handle 404 error - logout as requested
+            if (status === 404) {
+                errorMsg = 'Create order endpoint not found';
+                addLog(`❌ ${errorMsg}, logging out...`, 'error');
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                window.location.href = '/login';
+                return { success: false, message: errorMsg };
+            }
+
+            // Handle 401/403 errors
+            if (status === 401 || status === 403) {
+                errorMsg = 'Authentication failed';
+                addLog(`❌ ${errorMsg}, logging out...`, 'error');
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                window.location.href = '/login';
+                return { success: false, message: errorMsg };
+            }
+
+            setError(errorMsg);
+            addLog(`❌ ${errorMsg}: ${err.message}`, 'error');
+            console.error('OrderContext: Unexpected error:', err);
+            return { 
+                success: false, 
+                message: errorMsg 
+            };
+        } finally {
+            setLoading(false);
         }
-        
-        setError(errorMessage);
-        return { 
-          success: false, 
-          message: errorMessage,
-          validationErrors: result.validationErrors || []
-        };
-      }
-    } catch (err) {
-      console.error('OrderContext: Unexpected error:', err);
-      const message = 'An unexpected error occurred while creating your order';
-      setError(message);
-      return { 
-        success: false, 
-        message 
-      };
-    } finally {
-      setLoading(prev => ({ ...prev, create: false }));
-    }
-  }, []);
+    }, [addLog]);
 
-  // Get user orders (UNCHANGED)
-  const getUserOrders = useCallback(async (page = 1, perPage = 20, status = null) => {
-    setLoading(prev => ({ ...prev, orders: true }));
-    setError(null);
-    try {
-      console.log(`📋 OrderContext: Fetching orders page ${page}, perPage ${perPage}, status ${status}`);
-      
-      const result = await orderAPI.getUserOrders(page, perPage, status);
-      
-      console.log(`✅ OrderContext: API result:`, result);
-      
-      if (result.success) {
-        console.log(`📦 OrderContext: Received ${result.data?.length || 0} orders`);
+    // ===== FETCH USER ORDERS =====
+    const fetchUserOrders = useCallback(async (page = 1, perPage = 20, status = null) => {
+        setLoading(true);
+        setError(null);
+        addLog(`Fetching orders page ${page}, perPage ${perPage}, status ${status}...`, 'info');
         
-        if (page === 1) {
-          setOrders(result.data || []);
-        } else {
-          setOrders(prev => [...prev, ...(result.data || [])]);
+        try {
+            console.log(`📋 OrderContext: Fetching orders...`);
+            
+            const result = await orderApi.fetchUserOrders(page, perPage, status);
+            
+            console.log(`✅ OrderContext: API result:`, result);
+            
+            if (result.success) {
+                console.log(`📦 OrderContext: Received ${result.data?.length || 0} orders`);
+                
+                if (page === 1) {
+                    setOrders(result.data || []);
+                } else {
+                    setOrders(prev => [...prev, ...(result.data || [])]);
+                }
+                
+                addLog(`✅ Orders fetched: ${result.data?.length || 0} orders`, 'success');
+                return { 
+                    success: true, 
+                    data: result.data || [],
+                    pagination: result.pagination,
+                    isMock: result.isMock 
+                };
+            } else {
+                setError(result.message);
+                addLog(`❌ Failed to fetch orders: ${result.message}`, 'error');
+                return { success: false, message: result.message };
+            }
+        } catch (err) {
+            const status = err.response?.status;
+            let errorMsg = 'Failed to fetch orders';
+
+            // Handle 404 error - logout as requested
+            if (status === 404) {
+                errorMsg = 'Orders endpoint not found';
+                addLog(`❌ ${errorMsg}, logging out...`, 'error');
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                window.location.href = '/login';
+                return { success: false, message: errorMsg };
+            }
+
+            // Handle 401/403 errors
+            if (status === 401 || status === 403) {
+                errorMsg = 'Authentication failed';
+                addLog(`❌ ${errorMsg}, logging out...`, 'error');
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                window.location.href = '/login';
+                return { success: false, message: errorMsg };
+            }
+
+            setError(errorMsg);
+            addLog(`❌ ${errorMsg}: ${err.message}`, 'error');
+            console.error('OrderContext: Unexpected error:', err);
+            return { success: false, message: errorMsg };
+        } finally {
+            setLoading(false);
         }
+    }, [addLog]);
+
+    // ===== FETCH ORDER BY ID =====
+    const fetchOrderById = useCallback(async (orderId) => {
+        // Reset current order first
+        setCurrentOrder(null);
+        setError(null);
+        setLoading(true);
         
-        return { 
-          success: true, 
-          data: result.data || [],
-          pagination: result.pagination,
-          isMock: result.isMock 
-        };
-      } else {
-        console.error('❌ OrderContext: Failed to fetch orders:', result.message);
-        setError(result.message);
-        return { success: false, message: result.message };
-      }
-    } catch (err) {
-      console.error('🔥 OrderContext: Unexpected error:', err);
-      const message = 'Failed to fetch orders';
-      setError(message);
-      return { success: false, message };
-    } finally {
-      setLoading(prev => ({ ...prev, orders: false }));
-    }
-  }, []);
+        addLog(`Fetching order ID: ${orderId}...`, 'info');
+        
+        try {
+            console.log(`🔍 OrderContext: Fetching order with ID: ${orderId}`);
+            
+            const result = await orderApi.fetchOrderById(orderId);
+            
+            if (result.success) {
+                console.log('✅ OrderContext: Order fetched successfully:', result.data);
+                setCurrentOrder(result.data);
+                setError(null);
+                addLog(`✅ Order ${orderId} fetched successfully`, 'success');
+                return { 
+                    success: true, 
+                    data: result.data,
+                    isMock: result.isMock 
+                };
+            } else {
+                console.error('❌ OrderContext: Failed to fetch order:', result.message);
+                setError(result.message);
+                setCurrentOrder(null);
+                addLog(`❌ Failed to fetch order: ${result.message}`, 'error');
+                return { 
+                    success: false, 
+                    message: result.message 
+                };
+            }
+        } catch (err) {
+            const status = err.response?.status;
+            let errorMsg = 'Failed to fetch order details';
 
-  // Cancel order (UNCHANGED)
-  const cancelOrder = useCallback(async (orderId) => {
-    setLoading(prev => ({ ...prev, cancel: true }));
-    setError(null);
-    try {
-      const result = await orderAPI.cancelOrder(orderId);
-      if (result.success) {
-        setOrders(prev => 
-          prev.map(order => 
-            order.order_id === orderId 
-              ? { ...order, order_status: 'CANCELLED' }
-              : order
-          )
-        );
-        if (currentOrder?.order_id === orderId) {
-          setCurrentOrder(prev => ({ ...prev, order_status: 'CANCELLED' }));
+            // Handle 404 error - logout as requested
+            if (status === 404) {
+                errorMsg = 'Order endpoint not found';
+                addLog(`❌ ${errorMsg}, logging out...`, 'error');
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                window.location.href = '/login';
+                return { success: false, message: errorMsg };
+            }
+
+            // Handle 401/403 errors
+            if (status === 401 || status === 403) {
+                errorMsg = 'Authentication failed';
+                addLog(`❌ ${errorMsg}, logging out...`, 'error');
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                window.location.href = '/login';
+                return { success: false, message: errorMsg };
+            }
+
+            setError(errorMsg);
+            setCurrentOrder(null);
+            addLog(`❌ ${errorMsg}: ${err.message}`, 'error');
+            console.error('🔥 OrderContext: Unexpected error in fetchOrderById:', err);
+            return { 
+                success: false, 
+                message: errorMsg 
+            };
+        } finally {
+            setLoading(false);
         }
-        return { 
-          success: true, 
-          data: result.data,
-          message: result.message 
-        };
-      } else {
-        setError(result.message);
-        return { success: false, message: result.message };
-      }
-    } catch (err) {
-      const message = 'Failed to cancel order';
-      setError(message);
-      return { success: false, message };
-    } finally {
-      setLoading(prev => ({ ...prev, cancel: false }));
-    }
-  }, [currentOrder]);
+    }, [addLog]);
 
-  // Create return request (UNCHANGED)
-  const createReturnRequest = useCallback(async (orderId, returnData) => {
-    setLoading(prev => ({ ...prev, return: true }));
-    setError(null);
-    try {
-      const result = await orderAPI.createReturnRequest(orderId, returnData);
-      if (result.success) {
-        return { 
-          success: true, 
-          data: result.data, 
-          message: result.message 
-        };
-      } else {
-        setError(result.message);
-        return { success: false, message: result.message };
-      }
-    } catch (err) {
-      const message = 'Failed to create return request';
-      setError(message);
-      return { success: false, message };
-    } finally {
-      setLoading(prev => ({ ...prev, return: false }));
-    }
-  }, []);
+    // ===== CANCEL ORDER =====
+    const cancelOrder = useCallback(async (orderId) => {
+        setLoading(true);
+        setError(null);
+        addLog(`Cancelling order ID: ${orderId}...`, 'info');
+        
+        try {
+            const result = await orderApi.cancelOrder(orderId);
+            if (result.success) {
+                setOrders(prev => 
+                    prev.map(order => 
+                        order.order_id === orderId 
+                            ? { ...order, order_status: 'CANCELLED' }
+                            : order
+                    )
+                );
+                if (currentOrder?.order_id === orderId) {
+                    setCurrentOrder(prev => ({ ...prev, order_status: 'CANCELLED' }));
+                }
+                addLog(`✅ Order ${orderId} cancelled successfully`, 'success');
+                return { 
+                    success: true, 
+                    data: result.data,
+                    message: result.message 
+                };
+            } else {
+                setError(result.message);
+                addLog(`❌ Failed to cancel order: ${result.message}`, 'error');
+                return { success: false, message: result.message };
+            }
+        } catch (err) {
+            const status = err.response?.status;
+            let errorMsg = 'Failed to cancel order';
 
-  // Clear current order (UNCHANGED)
-  const clearCurrentOrder = useCallback(() => {
-    setCurrentOrder(null);
-  }, []);
+            // Handle 404 error - logout as requested
+            if (status === 404) {
+                errorMsg = 'Cancel order endpoint not found';
+                addLog(`❌ ${errorMsg}, logging out...`, 'error');
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                window.location.href = '/login';
+                return { success: false, message: errorMsg };
+            }
 
-  const value = {
-    orders,
-    currentOrder,
-    loading,
-    error,
-    clearError,
-    createOrder,
-    getUserOrders,
-    getOrderById,
-    cancelOrder,
-    createReturnRequest,
-    clearCurrentOrder
-  };
+            // Handle 401/403 errors
+            if (status === 401 || status === 403) {
+                errorMsg = 'Authentication failed';
+                addLog(`❌ ${errorMsg}, logging out...`, 'error');
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                window.location.href = '/login';
+                return { success: false, message: errorMsg };
+            }
 
-  return (
-    <OrderContext.Provider value={value}>
-      {children}
-    </OrderContext.Provider>
-  );
+            setError(errorMsg);
+            addLog(`❌ ${errorMsg}: ${err.message}`, 'error');
+            console.error('Cancel order error:', err);
+            return { success: false, message: errorMsg };
+        } finally {
+            setLoading(false);
+        }
+    }, [currentOrder, addLog]);
+
+    // ===== CREATE RETURN REQUEST =====
+    const createReturnRequest = useCallback(async (orderId, returnData) => {
+        setLoading(true);
+        setError(null);
+        addLog(`Creating return request for order ID: ${orderId}...`, 'info');
+        
+        try {
+            const result = await orderApi.createReturnRequest(orderId, returnData);
+            if (result.success) {
+                addLog('✅ Return request submitted successfully', 'success');
+                return { 
+                    success: true, 
+                    data: result.data, 
+                    message: result.message 
+                };
+            } else {
+                setError(result.message);
+                addLog(`❌ Failed to create return request: ${result.message}`, 'error');
+                return { success: false, message: result.message };
+            }
+        } catch (err) {
+            const status = err.response?.status;
+            let errorMsg = 'Failed to create return request';
+
+            // Handle 404 error - logout as requested
+            if (status === 404) {
+                errorMsg = 'Return request endpoint not found';
+                addLog(`❌ ${errorMsg}, logging out...`, 'error');
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                window.location.href = '/login';
+                return { success: false, message: errorMsg };
+            }
+
+            // Handle 401/403 errors
+            if (status === 401 || status === 403) {
+                errorMsg = 'Authentication failed';
+                addLog(`❌ ${errorMsg}, logging out...`, 'error');
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                window.location.href = '/login';
+                return { success: false, message: errorMsg };
+            }
+
+            setError(errorMsg);
+            addLog(`❌ ${errorMsg}: ${err.message}`, 'error');
+            console.error('Create return request error:', err);
+            return { success: false, message: errorMsg };
+        } finally {
+            setLoading(false);
+        }
+    }, [addLog]);
+
+    const value = {
+        // State
+        orders,
+        currentOrder,
+        loading,
+        error,
+        operationLogs,
+        
+        // Order Functions
+        createOrder,
+        fetchUserOrders,
+        fetchOrderById,
+        cancelOrder,
+        createReturnRequest,
+        
+        // Utility Functions
+        clearError,
+        clearAllData,
+        clearOperationLogs,
+        clearCurrentOrder,
+        addLog
+    };
+
+    return (
+        <OrderContext.Provider value={value}>
+            {children}
+        </OrderContext.Provider>
+    );
 };

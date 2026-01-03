@@ -319,3 +319,4 @@ class SubCategoryDetail(BaseModel):
 
 class SingleSubCategoryDetailWrapper(SuccessWrapper):
     data: SubCategoryDetail
+

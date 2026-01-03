@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from config.dependencies import get_db, is_admin
 from controllers.product_catalog.variant_controller import VariantController
 from schemas.product_schema import (
-    VariantCreate, VariantUpdate, SingleVariantWrapper, MessageWrapper
+    VariantCreate, VariantUpdate, SingleVariantWrapper, MessageWrapper, VariantVideoListWrapper, VariantImageListWrapper
 )
 from schemas.product_schema import PaginatedProductsWrapper
 from decimal import Decimal
@@ -171,3 +171,30 @@ def set_default(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/images/{variant_id}", response_model=VariantImageListWrapper)
+async def get_variant_images(
+    variant_id: int,
+    db: Session = Depends(get_db)
+):
+    controller = VariantController(db)
+    images = await controller.get_variant_images(variant_id)
+    return {
+        "success": True,
+        "message": "Images fetched successfully",
+        "data": images
+    }
+
+
+@router.get("/videos/{variant_id}", response_model=VariantVideoListWrapper)
+async def get_variant_videos(
+    variant_id: int,
+    db: Session = Depends(get_db)
+):
+    controller = VariantController(db)
+    videos = await controller.get_variant_videos(variant_id)
+    return {
+        "success": True,
+        "message": "Videos fetched successfully",
+        "data": videos
+    }

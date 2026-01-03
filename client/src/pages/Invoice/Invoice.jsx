@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useOrder } from '../../context/OrderContext';
+import { useOrderContext } from '../../context/OrderContext';
 import { toastSuccess } from '../../utils/customToast';
 import './Invoice.css';
 
 const Invoice = () => {
   const { orderId } = useParams();
-  const { getOrderById, currentOrder, loading } = useOrder();
+  const { fetchOrderById, currentOrder, loading } = useOrderContext();
 
   useEffect(() => {
     if (orderId) {
-      getOrderById(orderId);
+      fetchOrderById(orderId);
     }
-  }, [orderId, getOrderById]);
+  }, [orderId, fetchOrderById]);
 
   const handlePrint = () => {
     window.print();

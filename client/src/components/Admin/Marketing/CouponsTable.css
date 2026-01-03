@@ -1,0 +1,356 @@
+/* CouponsTable.css */
+
+.table-container {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border: none !important;
+}
+
+thead {
+    background-color: #f0f4ff;
+}
+
+thead tr {
+    border-bottom: 2px solid #e0e0e0;
+}
+
+th {
+    padding: 1.25rem 1rem;
+    text-align: left;
+    color: #2d3436;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none !important;
+}
+
+tbody tr {
+    border-bottom: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+tbody tr:hover {
+    background-color: #fafbfc;
+}
+
+tbody tr.inactive {
+    background-color: #f8f9fa;
+    opacity: 0.7;
+}
+
+tbody tr.expired {
+    background-color: rgba(255, 107, 107, 0.05);
+}
+
+tbody tr.expired:hover {
+    background-color: rgba(255, 107, 107, 0.08);
+}
+
+td {
+    padding: 1.25rem 1rem;
+    vertical-align: middle;
+    border: none !important;
+}
+
+/* Coupon Code Cell */
+.coupon-code {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.coupon-code strong {
+    color: #2d3436;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.expired-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background-color: #ff6b6b;
+    color: #ffffff;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* Description Cell */
+.coupon-description {
+    color: #636e72;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+/* Discount Cell */
+.discount-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.discount-value {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.discount-value.percent {
+    color: #667eea;
+}
+
+.discount-value.flat {
+    color: #48bb78;
+}
+
+.discount-type {
+    color: #636e72;
+    font-size: 0.85rem;
+}
+
+/* Usage Cell */
+.usage-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.usage-limit {
+    color: #2d3436;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+/* Status Cell */
+.status-cell {
+    display: flex;
+    justify-content: center;
+}
+
+.status-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    min-width: 100px;
+    justify-content: center;
+}
+
+.status-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.status-btn.active {
+    background-color: rgba(102, 126, 234, 0.1);
+    color: #5f4dd1;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+.status-btn.inactive {
+    background-color: rgba(99, 110, 114, 0.1);
+    color: #636e72;
+    border: 1px solid rgba(99, 110, 114, 0.3);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.status-btn.active .status-dot {
+    background-color: #5f4dd1;
+}
+
+.status-btn.inactive .status-dot {
+    background-color: #636e72;
+}
+
+/* Validity Cell */
+.validity-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.date-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.date-icon {
+    color: #667eea;
+    font-size: 0.9rem;
+}
+
+.date-text {
+    color: #2d3436;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.min-order {
+    color: #636e72;
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    display: inline-block;
+    max-width: fit-content;
+}
+
+/* Actions Cell */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.view-btn {
+    background-color: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+}
+
+.view-btn:hover {
+    background-color: #667eea;
+    color: #ffffff;
+}
+
+.edit-btn {
+    background-color: rgba(255, 215, 61, 0.1);
+    color: #d4b106;
+}
+
+.edit-btn:hover {
+    background-color: #ffd93d;
+    color: #2d3436;
+}
+
+.delete-btn {
+    background-color: rgba(255, 107, 107, 0.1);
+    color: #ff6b6b;
+}
+
+.delete-btn:hover {
+    background-color: #ff6b6b;
+    color: #ffffff;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    margin-top: 20px;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    color: #2d3436;
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+.empty-state p {
+    color: #636e72;
+    font-size: 1rem;
+    max-width: 400px;
+    margin: 0 auto 2rem;
+    line-height: 1.5;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .table-container {
+        overflow-x: auto;
+    }
+    
+    table {
+        min-width: 900px;
+    }
+}
+
+@media (max-width: 768px) {
+    th, td {
+        padding: 1rem 0.75rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .action-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+    }
+    
+    .status-btn {
+        min-width: 80px;
+        padding: 0.4rem 0.75rem;
+        font-size: 0.8rem;
+    }
+    
+    .empty-state {
+        padding: 3rem 1.5rem;
+    }
+    
+    .empty-icon {
+        font-size: 3rem;
+    }
+    
+    .empty-state h3 {
+        font-size: 1.25rem;
+    }
+}

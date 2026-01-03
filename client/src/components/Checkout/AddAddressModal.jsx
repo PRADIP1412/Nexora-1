@@ -1,21 +1,21 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useAddress } from '../../context/AddressContext';
+import React, { useState, useEffect } from 'react';
+import { useAddressContext } from '../../context/AddressContext';
 import { toastSuccess, toastError } from '../../utils/customToast';
 import './AddAddressModal.css';
 
 const AddAddressModal = ({ isOpen, onClose, onAddressAdded }) => {
-  const { 
-    states, 
-    cities, 
-    areas, 
-    getStates, 
-    getCitiesByState, 
-    getAreasByCity, 
+  const {
+    states,
+    cities,
+    areas,
+    fetchStates,
+    fetchCitiesByState,
+    fetchAreasByCity,
     createAddress,
-    loading: addressLoading 
-  } = useAddress();
-  
-  const [formData, setFormData] = useState({
+    loading
+  } = useAddressContext();
+
+  const initialFormState = {
     address_type: 'Home',
     line1: '',
     line2: '',
@@ -24,167 +24,127 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }) => {
     area_id: '',
     pincode: '',
     is_default: false
-  });
-  
+  };
+
+  const [formData, setFormData] = useState(initialFormState);
   const [dropdownLoading, setDropdownLoading] = useState({
     cities: false,
     areas: false
   });
 
-  // Reset form when modal opens/closes
-  const resetForm = useCallback(() => {
-    setFormData({
-      address_type: 'Home',
-      line1: '',
-      line2: '',
-      state_id: '',
-      city_id: '',
-      area_id: '',
-      pincode: '',
-      is_default: false
-    });
-  }, []);
-
+  /* -------------------- MODAL OPEN INIT -------------------- */
   useEffect(() => {
     if (isOpen) {
-      resetForm();
-      // Load states only if not already loaded
+      setFormData(initialFormState);
+
       if (states.length === 0) {
-        getStates();
+        fetchStates();
       }
     }
-  }, [isOpen, resetForm, getStates, states.length]);
+  }, [isOpen]); // ✅ ONLY depends on isOpen
 
-  const handleStateChange = useCallback(async (stateId) => {
-    const newFormData = {
-      ...formData,
+  if (!isOpen) return null;
+
+  /* -------------------- HANDLERS -------------------- */
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleStateChange = async (stateId) => {
+    setFormData(prev => ({
+      ...prev,
       state_id: stateId,
       city_id: '',
       area_id: '',
       pincode: ''
-    };
-    setFormData(newFormData);
-    
-    if (stateId) {
-      setDropdownLoading(prev => ({ ...prev, cities: true }));
-      try {
-        await getCitiesByState(stateId);
-      } catch (error) {
-        toastError('Failed to load cities');
-      } finally {
-        setDropdownLoading(prev => ({ ...prev, cities: false }));
-      }
-    }
-  }, [formData, getCitiesByState]);
+    }));
 
-  const handleCityChange = useCallback(async (cityId) => {
-    const newFormData = {
-      ...formData,
+    if (!stateId) return;
+
+    setDropdownLoading(prev => ({ ...prev, cities: true }));
+    try {
+      await fetchCitiesByState(stateId);
+    } catch {
+      toastError('Failed to load cities');
+    } finally {
+      setDropdownLoading(prev => ({ ...prev, cities: false }));
+    }
+  };
+
+  const handleCityChange = async (cityId) => {
+    setFormData(prev => ({
+      ...prev,
       city_id: cityId,
       area_id: '',
       pincode: ''
-    };
-    setFormData(newFormData);
-    
-    if (cityId) {
-      setDropdownLoading(prev => ({ ...prev, areas: true }));
-      try {
-        await getAreasByCity(cityId);
-      } catch (error) {
-        toastError('Failed to load areas');
-      } finally {
-        setDropdownLoading(prev => ({ ...prev, areas: false }));
-      }
-    }
-  }, [formData, getAreasByCity]);
+    }));
 
-  const handleAreaChange = useCallback((areaId) => {
-    const selectedArea = areas.find(area => area.area_id === areaId);
+    if (!cityId) return;
+
+    setDropdownLoading(prev => ({ ...prev, areas: true }));
+    try {
+      await fetchAreasByCity(cityId);
+    } catch {
+      toastError('Failed to load areas');
+    } finally {
+      setDropdownLoading(prev => ({ ...prev, areas: false }));
+    }
+  };
+
+  const handleAreaChange = (areaId) => {
+    const selectedArea = areas.find(a => a.area_id === parseInt(areaId));
+
     setFormData(prev => ({
       ...prev,
       area_id: areaId,
       pincode: selectedArea?.pincode || ''
     }));
-  }, [areas]);
-
-  const handleInputChange = useCallback((field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  }, []);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validation
-    if (!formData.line1.trim()) {
-      toastError('Please enter address line 1');
-      return;
-    }
-    
-    if (!formData.state_id) {
-      toastError('Please select a state');
-      return;
-    }
-    
-    if (!formData.city_id) {
-      toastError('Please select a city');
-      return;
-    }
-    
-    if (!formData.area_id) {
-      toastError('Please select an area');
-      return;
-    }
+
+    if (!formData.line1.trim()) return toastError('Enter address line 1');
+    if (!formData.state_id) return toastError('Select state');
+    if (!formData.city_id) return toastError('Select city');
+    if (!formData.area_id) return toastError('Select area');
 
     try {
-      const addressData = {
+      const payload = {
         address_type: formData.address_type,
         line1: formData.line1.trim(),
         line2: formData.line2.trim(),
-        area_id: parseInt(formData.area_id),
+        area_id: Number(formData.area_id),
         is_default: formData.is_default
       };
 
-      const result = await createAddress(addressData);
-      
-      if (result.success) {
+      const result = await createAddress(payload);
+
+      if (result?.success) {
         toastSuccess('Address added successfully');
         onAddressAdded(result.data);
         onClose();
-        resetForm();
       } else {
-        toastError(result.message || 'Failed to add address');
+        toastError(result?.message || 'Failed to add address');
       }
-    } catch (error) {
+    } catch {
       toastError('Failed to add address');
     }
   };
 
-  const handleClose = useCallback(() => {
-    resetForm();
-    onClose();
-  }, [resetForm, onClose]);
+  const isFormValid =
+    formData.line1.trim() &&
+    formData.state_id &&
+    formData.city_id &&
+    formData.area_id;
 
-  if (!isOpen) return null;
-
-  const isFormValid = formData.line1.trim() && 
-                     formData.state_id && 
-                     formData.city_id && 
-                     formData.area_id;
-
+  /* -------------------- UI -------------------- */
   return (
-    <div className="modal-overlay">
-      <div className="add-address-modal">
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="add-address-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Add New Address</h2>
-          <button 
-            type="button"
-            className="btn-close" 
-            onClick={handleClose}
-            disabled={addressLoading.create}
-          >
+          <button className="btn-close" onClick={onClose} disabled={loading}>
             <i className="fas fa-times"></i>
           </button>
         </div>
@@ -196,8 +156,7 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }) => {
               <select
                 value={formData.address_type}
                 onChange={(e) => handleInputChange('address_type', e.target.value)}
-                disabled={addressLoading.create}
-                required
+                disabled={loading}
               >
                 <option value="Home">Home</option>
                 <option value="Work">Work</option>
@@ -211,9 +170,7 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }) => {
                 type="text"
                 value={formData.line1}
                 onChange={(e) => handleInputChange('line1', e.target.value)}
-                placeholder="Street address, P.O. box, company name"
-                disabled={addressLoading.create}
-                required
+                disabled={loading}
               />
             </div>
 
@@ -223,8 +180,7 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }) => {
                 type="text"
                 value={formData.line2}
                 onChange={(e) => handleInputChange('line2', e.target.value)}
-                placeholder="Apartment, suite, unit, building, floor, etc."
-                disabled={addressLoading.create}
+                disabled={loading}
               />
             </div>
 
@@ -234,17 +190,15 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }) => {
                 <select
                   value={formData.state_id}
                   onChange={(e) => handleStateChange(e.target.value)}
-                  disabled={addressLoading.create || addressLoading.states}
-                  required
+                  disabled={loading}
                 >
                   <option value="">Select State</option>
-                  {states.map(state => (
-                    <option key={state.state_id} value={state.state_id}>
-                      {state.state_name}
+                  {states.map(s => (
+                    <option key={s.state_id} value={s.state_id}>
+                      {s.state_name}
                     </option>
                   ))}
                 </select>
-                {addressLoading.states && <div className="select-loading">Loading states...</div>}
               </div>
 
               <div className="form-group">
@@ -252,17 +206,15 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }) => {
                 <select
                   value={formData.city_id}
                   onChange={(e) => handleCityChange(e.target.value)}
-                  disabled={!formData.state_id || addressLoading.create || dropdownLoading.cities}
-                  required
+                  disabled={!formData.state_id || dropdownLoading.cities}
                 >
                   <option value="">Select City</option>
-                  {cities.map(city => (
-                    <option key={city.city_id} value={city.city_id}>
-                      {city.city_name}
+                  {cities.map(c => (
+                    <option key={c.city_id} value={c.city_id}>
+                      {c.city_name}
                     </option>
                   ))}
                 </select>
-                {dropdownLoading.cities && <div className="select-loading">Loading cities...</div>}
               </div>
             </div>
 
@@ -272,17 +224,15 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }) => {
                 <select
                   value={formData.area_id}
                   onChange={(e) => handleAreaChange(e.target.value)}
-                  disabled={!formData.city_id || addressLoading.create || dropdownLoading.areas}
-                  required
+                  disabled={!formData.city_id || dropdownLoading.areas}
                 >
                   <option value="">Select Area</option>
-                  {areas.map(area => (
-                    <option key={area.area_id} value={area.area_id}>
-                      {area.area_name}
+                  {areas.map(a => (
+                    <option key={a.area_id} value={a.area_id}>
+                      {a.area_name}
                     </option>
                   ))}
                 </select>
-                {dropdownLoading.areas && <div className="select-loading">Loading areas...</div>}
               </div>
 
               <div className="form-group">
@@ -291,7 +241,6 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }) => {
                   type="text"
                   value={formData.pincode}
                   readOnly
-                  placeholder="Auto-filled from area"
                   className="readonly-input"
                 />
               </div>
@@ -302,8 +251,9 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }) => {
                 <input
                   type="checkbox"
                   checked={formData.is_default}
-                  onChange={(e) => handleInputChange('is_default', e.target.checked)}
-                  disabled={addressLoading.create}
+                  onChange={(e) =>
+                    handleInputChange('is_default', e.target.checked)
+                  }
                 />
                 <span className="checkbox-custom"></span>
                 Set as default address
@@ -311,27 +261,15 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }) => {
             </div>
 
             <div className="modal-actions">
-              <button 
-                type="button" 
-                className="btn-cancel"
-                onClick={handleClose}
-                disabled={addressLoading.create}
-              >
+              <button type="button" className="btn-cancel" onClick={onClose}>
                 Cancel
               </button>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="btn-save"
-                disabled={!isFormValid || addressLoading.create}
+                disabled={!isFormValid || loading}
               >
-                {addressLoading.create ? (
-                  <>
-                    <i className="fas fa-spinner fa-spin"></i>
-                    Adding...
-                  </>
-                ) : (
-                  'Save Address'
-                )}
+                {loading ? 'Adding...' : 'Save Address'}
               </button>
             </div>
           </form>

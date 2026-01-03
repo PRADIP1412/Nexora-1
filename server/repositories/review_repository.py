@@ -80,3 +80,64 @@ class ReviewRepository:
     def get_review_by_id(db: Session, review_id: int) -> Optional[ProductReview]:
         """Get review by ID"""
         return db.query(ProductReview).filter(ProductReview.review_id == review_id).first()
+
+    # ADMIN: Fetch all reviews (pagination)
+    @staticmethod
+    def fetch_all_reviews(db: Session, page: int = 1, per_page: int = 10):
+        query = db.query(ProductReview).order_by(ProductReview.created_at.desc())
+        total = query.count()
+        offset = (page - 1) * per_page
+        reviews = query.offset(offset).limit(per_page).all()
+
+        return {
+            "items": reviews,
+            "total": total,
+            "page": page,
+            "per_page": per_page,
+            "total_pages": math.ceil(total / per_page) if per_page > 0 else 0
+        }
+
+
+    # ADMIN: Update review status
+    @staticmethod
+    def update_review_status(db: Session, review_id: int, status: str):
+        review = db.query(ProductReview).filter(ProductReview.review_id == review_id).first()
+        if review:
+            review.status = status
+            db.commit()
+            db.refresh(review)
+        return review
+
+
+    # ADMIN: Add reply
+    @staticmethod
+    def add_admin_reply(db: Session, review_id: int, admin_id: int, body: str):
+        from models.product_catalog.review_reply import ReviewReply
+        reply = ReviewReply(review_id=review_id, user_id=admin_id, body=body)
+        db.add(reply)
+        db.commit()
+        db.refresh(reply)
+        return reply
+
+
+    # ADMIN: Delete reply
+    @staticmethod
+    def delete_reply(db: Session, reply_id: int):
+        from models.product_catalog.review_reply import ReviewReply
+        reply = db.query(ReviewReply).filter(ReviewReply.reply_id == reply_id).first()
+        if reply:
+            db.delete(reply)
+            db.commit()
+            return True
+        return False
+
+
+    # ADMIN: Delete any review (force delete)
+    @staticmethod
+    def admin_delete_review(db: Session, review_id: int):
+        review = db.query(ProductReview).filter(ProductReview.review_id == review_id).first()
+        if review:
+            db.delete(review)
+            db.commit()
+            return True
+        return False

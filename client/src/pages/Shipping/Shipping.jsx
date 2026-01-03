@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toastSuccess, toastError } from '../../utils/customToast';
-import { useCart } from '../../context/CartContext';
+import { useCartContext } from '../../context/CartContext';
 import './Shipping.css';
 
 const Shipping = () => {
@@ -9,7 +9,7 @@ const Shipping = () => {
   const [deliveryInstructions, setDeliveryInstructions] = useState('');
   const navigate = useNavigate();
   
-  const { cartItems, getCartTotal } = useCart();
+  const { cart } = useCartContext();
 
   const shippingMethods = [
     {
@@ -50,7 +50,8 @@ const Shipping = () => {
     }
   ];
 
-  const subtotal = getCartTotal();
+  const cartItems = cart?.items || [];
+  const subtotal = cart?.subtotal || 0;
   const tax = subtotal * 0.08;
 
   const handleContinue = () => {
@@ -146,9 +147,9 @@ const Shipping = () => {
               <h3>Order Summary</h3>
               <div className="order-items">
                 {cartItems.map(item => (
-                  <div key={item.id} className="order-item">
+                  <div key={item.variant_id} className="order-item">
                     <div className="item-info">
-                      <span className="item-name">{item.name}</span>
+                      <span className="item-name">{item.product_name}</span>
                       <span className="item-quantity">Qty: {item.quantity}</span>
                     </div>
                     <span className="item-price">${(item.price * item.quantity).toFixed(2)}</span>

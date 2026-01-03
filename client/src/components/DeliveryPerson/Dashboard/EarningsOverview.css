@@ -1,0 +1,167 @@
+.earnings-overview {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 24px;
+}
+
+.earnings-overview h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.earnings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.earnings-card {
+    border-radius: 10px;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), transparent);
+    border: 1px solid #e9ecef;
+    position: relative;
+    overflow: hidden;
+}
+
+.earnings-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--card-color, #3b82f6);
+}
+
+.earnings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.earnings-period {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.color-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--card-color, #3b82f6);
+}
+
+.earnings-amount {
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 8px;
+    line-height: 1;
+}
+
+.earnings-details {
+    font-size: 14px;
+    color: #6c757d;
+    margin-bottom: 12px;
+}
+
+.deliveries-count, .pending-description {
+    display: inline-block;
+    padding: 4px 8px;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.earnings-trend {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #f1f3f5;
+}
+
+.trend-up {
+    font-size: 13px;
+    color: #10b981;
+    font-weight: 500;
+}
+
+/* Loading states */
+.earnings-grid.loading {
+    opacity: 0.8;
+}
+
+.earnings-card.loading-card {
+    min-height: 140px;
+}
+
+.earnings-card.loading-card .earnings-header,
+.earnings-card.loading-card .earnings-amount,
+.earnings-card.loading-card .earnings-details {
+    position: relative;
+}
+
+.earnings-card.loading-card .earnings-header::before,
+.earnings-card.loading-card .earnings-amount::before,
+.earnings-card.loading-card .earnings-details::before {
+    content: '';
+    display: block;
+    background: #e9ecef;
+    border-radius: 4px;
+    animation: pulse 1.5s infinite;
+}
+
+.earnings-card.loading-card .earnings-header::before {
+    height: 18px;
+    width: 100px;
+}
+
+.earnings-card.loading-card .earnings-amount::before {
+    height: 28px;
+    width: 120px;
+    margin-bottom: 8px;
+}
+
+.earnings-card.loading-card .earnings-details::before {
+    height: 14px;
+    width: 80px;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.no-data {
+    text-align: center;
+    padding: 40px;
+}
+
+.no-data p {
+    margin-bottom: 16px;
+    color: #6c757d;
+}
+
+.retry-btn {
+    padding: 10px 20px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.retry-btn:hover {
+    background: #2563eb;
+}

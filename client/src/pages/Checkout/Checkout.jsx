@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAddress } from '../../context/AddressContext';
-import { useCheckout } from '../../context/CheckoutContext';
-import { useCart } from '../../context/CartContext';
+import { useAddressContext } from '../../context/AddressContext';
+import { useCheckoutContext } from '../../context/CheckoutContext';
+import { useCartContext } from '../../context/CartContext';
 import CheckoutStepper from '../../components/Checkout/CheckoutStepper';
 import AddressSelector from '../../components/Checkout/AddressSelector';
 import PaymentMethodSelector from '../../components/Checkout/PaymentMethodSelector';
@@ -12,20 +12,34 @@ import { toastSuccess, toastError } from '../../utils/customToast';
 import './Checkout.css';
 
 const Checkout = () => {
-  const { currentStep, setCurrentStep, verifiedAddress, setVerifiedAddress, selectedPayment, setSelectedPayment, orderNotes, setOrderNotes, checkoutSummary } = useCheckout();
-  const [selectedAddress, setSelectedAddress] = useState(null); // ADD THIS LINE
+  const { 
+    currentStep, 
+    setCurrentStep, 
+    verifiedAddress, 
+    setVerifiedAddress, 
+    selectedPayment, 
+    setSelectedPayment, 
+    orderNotes, 
+    setOrderNotes, 
+    checkoutSummary,
+    fetchPaymentMethods,
+    paymentMethods,
+    loading: checkoutLoading,
+    setCartItems,
+    setCheckoutSummary
+  } = useCheckoutContext();
+  
+  const [selectedAddress, setSelectedAddress] = useState(null);
   const [showAddAddressModal, setShowAddAddressModal] = useState(false);
   const navigate = useNavigate();
   
-  const { addresses, getUserAddresses, loading: addressLoading } = useAddress();
-  const { paymentMethods, getPaymentMethods, loading: checkoutLoading } = useCheckout();
-  const { cart, isCartLoading } = useCart();
-  const { setCartItems } = useCheckout();
+  const { addresses, fetchUserAddresses, loading: addressLoading } = useAddressContext();
+  const { cart, loading: isCartLoading } = useCartContext();
 
   useEffect(() => {
-    getUserAddresses();
-    getPaymentMethods();
-  }, [getUserAddresses, getPaymentMethods]);
+    fetchUserAddresses();
+    fetchPaymentMethods();
+  }, [fetchUserAddresses, fetchPaymentMethods]);
 
   // Set verified address as selected when returning from address verification
   useEffect(() => {
@@ -37,11 +51,13 @@ const Checkout = () => {
       }
     }
   }, [verifiedAddress, currentStep, setCurrentStep]);
+
   useEffect(() => {
     if (cart?.items) {
       setCartItems(cart);
     }
   }, [cart, setCartItems]);
+
   // Set first address as selected when addresses load
   useEffect(() => {
     if (addresses.length > 0 && !selectedAddress && !verifiedAddress) {
@@ -80,12 +96,18 @@ const Checkout = () => {
     }
     
     if (currentStep === 3) {
-      // Navigate to payment processing
-      console.log('Navigating to payment processing with:', {
-        selectedPayment,
-        verifiedAddress,
-        checkoutSummary
-      });
+      const summary = {
+        items: cartItems,
+        subtotal,
+        tax_amount: tax,
+        delivery_fee: shipping,
+        discount_amount: 0,
+        total_amount: total,
+        coupon_code: null
+      };
+
+      setCheckoutSummary(summary);
+
       navigate('/payment-processing');
       return;
     }
@@ -107,7 +129,7 @@ const Checkout = () => {
 
   const handleAddressAdded = (newAddress) => {
     // Refresh addresses list
-    getUserAddresses();
+    fetchUserAddresses();
     // Select the new address
     setSelectedAddress(newAddress);
     setShowAddAddressModal(false);
@@ -120,8 +142,9 @@ const Checkout = () => {
     // It will be verified when they click "Continue"
   };
 
-  const isLoadingAddresses = addressLoading.addresses || addressLoading.states;
-  const isPageLoading = isLoadingAddresses || checkoutLoading.paymentMethods || isCartLoading;
+  const isLoadingAddresses = addressLoading;
+  const isPageLoading = checkoutLoading || isCartLoading;
+
 
   if (isPageLoading) {
     return (
@@ -163,7 +186,6 @@ const Checkout = () => {
                   selectedAddress={selectedAddress}
                   onSelectAddress={handleAddressSelect}
                   onAddNewAddress={handleAddNewAddress}
-                  loading={addressLoading.addresses}
                 />
                 
                 <div className="order-notes">
@@ -186,7 +208,7 @@ const Checkout = () => {
                   paymentMethods={paymentMethods}
                   selectedPayment={selectedPayment}
                   onSelectPayment={setSelectedPayment}
-                  loading={checkoutLoading.paymentMethods}
+                  loading={checkoutLoading}
                 />
               </div>
             )}
@@ -234,7 +256,7 @@ const Checkout = () => {
               <button 
                 className="btn-prev"
                 onClick={handlePreviousStep}
-                disabled={addressLoading.create}
+                disabled={addressLoading}
               >
                 <i className="fas fa-arrow-left"></i>
                 {currentStep === 1 ? 'Back to Cart' : 'Previous'}
@@ -246,7 +268,7 @@ const Checkout = () => {
                 disabled={
                   (currentStep === 1 && !selectedAddress) ||
                   (currentStep === 2 && !selectedPayment) ||
-                  addressLoading.create
+                  addressLoading
                 }
               >
                 {currentStep === 1 ? 'Verify Address' : 

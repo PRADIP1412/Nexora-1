@@ -236,3 +236,12 @@ class VariantService:
         self.repository.update_variant(self.db, variant, {"is_default": True})
         
         return {"message": "Default variant updated successfully"}
+
+    def fetch_variant_images(self, variant_id: int):
+        images = self.repository.get_all_images_by_variant(self.db, variant_id)
+        return images
+
+
+    def fetch_variant_videos(self, variant_id: int):
+        videos = self.repository.get_all_videos_by_variant(self.db, variant_id)
+        return videos

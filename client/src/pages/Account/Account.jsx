@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAccount } from '../../context/AccountContext';
+import { useAccountContext } from '../../context/AccountContext'; // ✅ Fixed import
 import { useAuth } from '../../context/AuthContext';
-import { toastSuccess, toastError, toastWarning, toastInfo } from '../../utils/customToast';
+import { toastSuccess, toastError, toastInfo } from '../../utils/customToast';
 import './Account.css';
 
 const Account = () => {
@@ -15,13 +15,23 @@ const Account = () => {
         confirmPassword: ''
     });
     
-    const { dashboard, loading, error, refetchDashboard } = useAccount();
+    const { dashboard, loading, error, fetchDashboard } = useAccountContext(); // ✅ Note: changed refetchDashboard to fetchDashboard
     const { user: authUser } = useAuth();
     const navigate = useNavigate();
 
+    // Toast configuration
+    const toastConfig = {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+    };
+
     // Handle input changes for profile data
     const handleInputChange = (field, value) => {
-        toastInfo('Edit functionality requires update API implementation');
+        toastInfo('Edit functionality requires update API implementation', toastConfig);
     };
 
     // Handle password change
@@ -29,28 +39,28 @@ const Account = () => {
         e.preventDefault();
         
         if (passwordData.newPassword !== passwordData.confirmPassword) {
-            toastError('New passwords do not match');
+            toastError('New passwords do not match', toastConfig);
             return;
         }
 
         if (passwordData.newPassword.length < 6) {
-            toastError('Password must be at least 6 characters long');
+            toastError('Password must be at least 6 characters long', toastConfig);
             return;
         }
 
         if (!passwordData.currentPassword) {
-            toastError('Please enter your current password');
+            toastError('Please enter your current password', toastConfig);
             return;
         }
 
         try {
             // Implement your password change API call here
             // await accountAPI.changePassword(passwordData);
-            toastSuccess('Password changed successfully!');
+            toastSuccess('Password changed successfully!', toastConfig);
             setIsChangingPassword(false);
             setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
         } catch (error) {
-            toastError('Failed to change password. Please try again.');
+            toastError('Failed to change password. Please try again.', toastConfig);
         }
     };
 
@@ -59,11 +69,11 @@ const Account = () => {
         try {
             // Implement your profile update API call here
             // await accountAPI.updateProfile(updatedData);
-            toastSuccess('Profile updated successfully!');
+            toastSuccess('Profile updated successfully!', toastConfig);
             setIsEditing(false);
-            refetchDashboard(); // Refresh dashboard data
+            fetchDashboard(); // Refresh dashboard data - ✅ Changed refetchDashboard to fetchDashboard
         } catch (error) {
-            toastError('Failed to update profile. Please try again.');
+            toastError('Failed to update profile. Please try again.', toastConfig);
         }
     };
 
@@ -72,22 +82,22 @@ const Account = () => {
         switch (action) {
             case 'profile':
                 navigate('/profile');
-                toastInfo('Navigating to profile');
+                toastInfo('Navigating to profile', toastConfig);
                 break;
             case 'orders':
                 navigate('/orders');
-                toastInfo('Navigating to orders');
+                toastInfo('Navigating to orders', toastConfig);
                 break;
             case 'wishlist':
                 navigate('/wishlist');
-                toastInfo('Navigating to wishlist');
+                toastInfo('Navigating to wishlist', toastConfig);
                 break;
             case 'support':
                 navigate('/support');
-                toastInfo('Navigating to support',);
+                toastInfo('Navigating to support', toastConfig);
                 break;
             default:
-                toastInfo(`Navigating to ${action}`);
+                toastInfo(`Navigating to ${action}`, toastConfig);
         }
     };
 
@@ -95,8 +105,8 @@ const Account = () => {
     const getUserData = () => {
         if (dashboard?.overview) {
             return {
-                first_name: dashboard.overview.name.split(' ')[0] || 'User',
-                last_name: dashboard.overview.name.split(' ').slice(1).join(' ') || '',
+                first_name: dashboard.overview.name?.split(' ')[0] || 'User',
+                last_name: dashboard.overview.name?.split(' ').slice(1).join(' ') || '',
                 email: dashboard.overview.email || '',
                 membership_tier: dashboard.overview.membership_tier || 'Standard',
                 status: dashboard.overview.account_status || 'Active',
@@ -106,13 +116,13 @@ const Account = () => {
         }
         // Fallback to auth user data
         return {
-            first_name: authUser?.firstname || 'User',
-            last_name: authUser?.lastname || '',
+            first_name: authUser?.first_name || authUser?.firstname || 'User',
+            last_name: authUser?.last_name || authUser?.lastname || '',
             email: authUser?.email || '',
             membership_tier: 'Standard',
             status: 'Active',
-            join_date: authUser?.joined_date || new Date().toISOString(),
-            phone: ''
+            join_date: authUser?.created_at || authUser?.joined_date || new Date().toISOString(),
+            phone: authUser?.phone || ''
         };
     };
 
@@ -140,7 +150,7 @@ const Account = () => {
                         <i className="fas fa-exclamation-triangle"></i>
                         <h3>Unable to load account data</h3>
                         <p>{error}</p>
-                        <button onClick={refetchDashboard} className="btn-retry">
+                        <button onClick={fetchDashboard} className="btn-retry"> {/* ✅ Changed refetchDashboard to fetchDashboard */}
                             <i className="fas fa-redo"></i>
                             Try Again
                         </button>
@@ -196,9 +206,9 @@ const Account = () => {
                                 onClick={() => {
                                     setIsEditing(!isEditing);
                                     if (!isEditing) {
-                                        toastInfo('You can now edit your account information');
+                                        toastInfo('You can now edit your account information', toastConfig);
                                     } else {
-                                        toastInfo('Edit mode cancelled');
+                                        toastInfo('Edit mode cancelled', toastConfig);
                                     }
                                 }}
                             >
@@ -221,7 +231,7 @@ const Account = () => {
                         className={`nav-btn ${activeSection === 'overview' ? 'active' : ''}`}
                         onClick={() => {
                             setActiveSection('overview');
-                            toastInfo('Viewing account overview');
+                            toastInfo('Viewing account overview', toastConfig);
                         }}
                     >
                         <i className="fas fa-chart-pie"></i>
@@ -231,7 +241,7 @@ const Account = () => {
                         className={`nav-btn ${activeSection === 'settings' ? 'active' : ''}`}
                         onClick={() => {
                             setActiveSection('settings');
-                            toastInfo('Viewing account settings');
+                            toastInfo('Viewing account settings', toastConfig);
                         }}
                     >
                         <i className="fas fa-cog"></i>
@@ -241,7 +251,7 @@ const Account = () => {
                         className={`nav-btn ${activeSection === 'billing' ? 'active' : ''}`}
                         onClick={() => {
                             setActiveSection('billing');
-                            toastInfo('Viewing billing information');
+                            toastInfo('Viewing billing information', toastConfig);
                         }}
                     >
                         <i className="fas fa-credit-card"></i>
@@ -251,7 +261,7 @@ const Account = () => {
                         className={`nav-btn ${activeSection === 'security' ? 'active' : ''}`}
                         onClick={() => {
                             setActiveSection('security');
-                            toastInfo('Viewing security settings');
+                            toastInfo('Viewing security settings', toastConfig);
                         }}
                     >
                         <i className="fas fa-shield-alt"></i>
@@ -451,7 +461,7 @@ const Account = () => {
                                         className="btn-change-password"
                                         onClick={() => {
                                             setIsChangingPassword(true);
-                                            toast.info('You can now change your password', toastConfig);
+                                            toastInfo('You can now change your password', toastConfig);
                                         }}
                                     >
                                         Change Password
@@ -508,7 +518,7 @@ const Account = () => {
                                                 onClick={() => {
                                                     setIsChangingPassword(false);
                                                     setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-                                                    toast.info('Password change cancelled', toastConfig);
+                                                    toastInfo('Password change cancelled', toastConfig);
                                                 }}
                                             >
                                                 Cancel
@@ -637,7 +647,14 @@ const getLastPasswordChange = () => {
 
 const handlePreferenceChange = (key, value) => {
     // Implement preference update logic
-    toastInfo('Preference update functionality requires API implementation');
+    toastInfo('Preference update functionality requires API implementation', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+    });
 };
 
 export default Account;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useOffer } from '../../context/OfferContext';
+import { useOfferContext } from '../../context/OfferContext';
 import OfferList from '../../components/Offer/OfferList';
 import './OffersPage.css';
 
@@ -12,14 +12,15 @@ const OffersPage = () => {
     activeOffers, 
     allOffers, 
     offerStats,
-    loadAllOffers,
-    isLoading,
+    fetchAllOffers,
+    loading,
     error,
     deleteExistingOffer,
     updateOfferActiveStatus,
     createNewOffer,
-    updateExistingOffer
-  } = useOffer();
+    updateExistingOffer,
+    fetchActiveOffers
+  } = useOfferContext();
   
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -28,9 +29,11 @@ const OffersPage = () => {
 
   useEffect(() => {
     if (isAdmin) {
-      loadAllOffers();
+      fetchAllOffers();
+    } else {
+      fetchActiveOffers();
     }
-  }, [isAdmin, loadAllOffers]);
+  }, [isAdmin, fetchAllOffers, fetchActiveOffers]);
 
   const handleOfferSelect = (offer) => {
     navigate('/products', { 
@@ -100,11 +103,11 @@ const OffersPage = () => {
           </div>
         )}
 
-        {error && !isLoading && (
+        {error && !loading && (
           <div className="error-alert">
             <i className="fas fa-exclamation-triangle"></i>
             {error}
-            <button className="retry-btn" onClick={() => loadAllOffers()}>
+            <button className="retry-btn" onClick={() => isAdmin ? fetchAllOffers() : fetchActiveOffers()}>
               Retry
             </button>
           </div>
@@ -172,7 +175,7 @@ const OffersPage = () => {
         )}
 
         <div className="offers-section">
-          {isLoading && allOffers.length === 0 ? (
+          {loading && allOffers.length === 0 && activeOffers.length === 0 ? (
             <div className="loading-container">
               <div className="loading-spinner-large"></div>
               <p>Loading offers...</p>

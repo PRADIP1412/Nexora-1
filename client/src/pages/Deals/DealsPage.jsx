@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCoupon } from '../../context/CouponContext';
-import { useOffer } from '../../context/OfferContext';
-import { useCart } from '../../context/CartContext';
+import { useCouponContext } from '../../context/CouponContext'; // Changed from useCoupon
+import { useOfferContext } from '../../context/OfferContext'; // Changed from useOffer
+import { useCartContext } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { fetchDiscountedProducts } from '../../api/product';
 import './DealsPage.css';
 
 const DealsPage = () => {
   const navigate = useNavigate();
-  const { activeCoupons, loadActiveCoupons, isLoading: couponsLoading } = useCoupon();
-  const { activeOffers, loadActiveOffers, isLoading: offersLoading } = useOffer();
-  const { addToCart } = useCart();
+  const { activeCoupons, fetchActiveCoupons, loading: couponsLoading } = useCouponContext(); // Changed from useCoupon
+  const { activeOffers, fetchActiveOffers, loading: offersLoading } = useOfferContext(); // Changed from useOffer
+  const { addItemToCart } = useCartContext();
   const { isAuthenticated } = useAuth();
   
   const [activeTab, setActiveTab] = useState('all');
@@ -56,8 +56,8 @@ const DealsPage = () => {
     const loadDeals = async () => {
       try {
         await Promise.all([
-          loadActiveCoupons(),
-          loadActiveOffers(),
+          fetchActiveCoupons(),
+          fetchActiveOffers(),
           loadDiscountedProducts()
         ]);
       } catch (error) {
@@ -159,10 +159,18 @@ const DealsPage = () => {
   };
 
   // Add product to cart
-  const handleAddToCart = (product) => {
+  const handleAddToCart = async (product) => {
     if (product.variant_id) {
-      addToCart(product.variant_id, 1);
-      alert(`Added ${product.title} to cart!`);
+      try {
+        const result = await addItemToCart(product.variant_id, 1);
+        if (result.success) {
+          alert(`Added ${product.title} to cart!`);
+        } else {
+          alert(`Failed to add to cart: ${result.message}`);
+        }
+      } catch (error) {
+        alert('Error adding to cart. Please try again.');
+      }
     } else {
       console.error('No variant ID found for product:', product.product_id);
       navigate(`/products/${product.product_id}`);
@@ -170,10 +178,18 @@ const DealsPage = () => {
   };
 
   // Buy now
-  const handleBuyNow = (product) => {
+  const handleBuyNow = async (product) => {
     if (product.variant_id) {
-      addToCart(product.variant_id, 1);
-      navigate('/checkout');
+      try {
+        const result = await addItemToCart(product.variant_id, 1);
+        if (result.success) {
+          navigate('/checkout');
+        } else {
+          alert(`Failed to add to cart: ${result.message}`);
+        }
+      } catch (error) {
+        alert('Error processing your request. Please try again.');
+      }
     } else {
       navigate(`/products/${product.product_id}`);
     }

@@ -89,3 +89,18 @@ class VariantRepository:
             ProductVariant.product_id == product_id,
             ProductVariant.variant_id != exclude_variant_id
         ).first()
+    @staticmethod
+    def get_all_images_by_variant(db: Session, variant_id: int):
+        return (
+            db.query(ProductImage)
+            .filter(ProductImage.variant_id == variant_id)
+            .order_by(ProductImage.is_default.desc())
+            .all()
+        )
+    @staticmethod
+    def get_all_videos_by_variant(db: Session, variant_id: int):
+        return (
+            db.query(ProductVideo)
+            .filter(ProductVideo.variant_id == variant_id)
+            .all()
+        )

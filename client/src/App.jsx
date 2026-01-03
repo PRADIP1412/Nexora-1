@@ -5,12 +5,21 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import Layout from './components/Layout';
 
-// Pages
+// Import Panel Components
+import AdminPanel from './pages/Admin/AdminPanel';
+import DeliveryPanel from './pages/DeliveryPerson/DeliveryPanel';
+
+// Public Pages
 import Home from './pages/Home/Home';
 import Login from './pages/Login/Login';
 import Signup from './pages/Signup/Signup';
 import ProductsList from './pages/ProductsList/ProductsList';
 import ProductDetail from './pages/ProductDetail/ProductDetail';
+
+// Not Authorized Page
+import NotAuthorized from './pages/NotAuthorized/NotAuthorized';
+
+// Customer Pages
 import Cart from './pages/Cart/Cart';
 import Wishlist from './pages/Wishlist/Wishlist';
 import Profile from './pages/Profile/Profile';
@@ -39,29 +48,34 @@ import NotificationPage from './pages/Notification/NotificationPage';
 import DealsPage from './pages/Deals/DealsPage';
 import NewArrivalsPage from './pages/NewArrivals/NewArrivalsPage';
 
-// Admin Product Catalog Pages
-import ProductsPage from './pages/Admin/ProductCatalog/Products';
-import CategoriesPage from './pages/Admin/ProductCatalog/Categories';
-import BrandsPage from './pages/Admin/ProductCatalog/Brands';
-import AttributesPage from './pages/Admin/ProductCatalog/Attributes';
-import MediaPage from './pages/Admin/ProductCatalog/Media';
-
 // Protected Routes
 import ProtectedRoute from './routes/ProtectedRoute';
-import AdminRoute from './routes/AdminRoute';
-
-// Admin
-import AdminDashboard from './pages/Admin/Dashboard/Dashboard';
-import DebugPage from './pages/Debug/DebugPage';
-import { DashboardProvider } from './context/admin/DashboardContext';
 
 // Context Providers
 import { ProductProvider } from './context/ProductContext';
 import { CategoryProvider } from './context/CategoryContext';
 import { BrandProvider } from './context/BrandContext';
 import { CatalogProvider } from './context/CatalogContext';
-import ReviewsPage from './pages/Admin/ProductCatalog/Review';
 import { AttributeProvider } from './context/AttributeContext';
+import { ProductReviewProvider } from './context/ProductReviewContext';
+import { MediaProvider } from './context/MediaContext';
+import { VariantProvider } from './context/VariantContext';
+import { CustomerProvider } from './context/CustomerContext';
+import { OrderAdminProvider } from './context/OrderAdminContext';
+import { MarketingProvider } from './context/MarketingContext';
+import { DeliveryProvider } from './context/DeliveryContext';
+import { InventoryProvider } from './context/InventoryContext';
+import { AnalyticsProvider } from './context/AnalyticsContext';
+import { NotificationAdminProvider } from './context/NotificationAdminContext';
+import { ReportsProvider } from './context/ReportsContext';
+import { SystemProvider } from './context/SystemContext';
+
+// Import the Example page and its required providers
+import Example from './pages/Example';
+import { AvailableDeliveriesProvider } from './context/delivery_panel/AvailableDeliveriesContext';
+import { DeliveryReportsProvider } from './context/delivery_panel/DeliveryReportsContext';
+
+import DebugPage from './pages/Debug/DebugPage';
 
 function App() {
   return (
@@ -81,7 +95,31 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/guest-checkout" element={<GuestCheckout />} />
+        
+        {/* Not Authorized Page */}
+        <Route path="/not-authorized" element={<NotAuthorized />} />
 
+        {/* ==================== ADMIN PANEL ROUTES ==================== */}
+        <Route
+          path="/admin/*"
+          element={
+            <ProtectedRoute adminOnly={true}>
+              <AdminPanel />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ==================== DELIVERY PERSON PANEL ROUTES ==================== */}
+        <Route
+          path="/delivery/*"
+          element={
+            <ProtectedRoute deliveryOnly={true}>
+              <DeliveryPanel />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ==================== REGULAR USER ROUTES ==================== */}
         {/* Layout Wrapper */}
         <Route element={<Layout />}>
           <Route
@@ -163,85 +201,19 @@ function App() {
           <Route path="/offers/:offerId" element={<OfferDetailsPage />} />
         </Route>
 
-        {/* Admin Routes */}
+        {/* Example page for testing */}
         <Route
-          path="/admin/dashboard"
+          path="/example"
           element={
-            <ProtectedRoute adminOnly={true}>
-              <DashboardProvider>
-                <AdminDashboard />
-              </DashboardProvider>
+            <ProtectedRoute deliveryOnly={true}>
+              <AvailableDeliveriesProvider>
+                <Example />
+              </AvailableDeliveriesProvider>
             </ProtectedRoute>
           }
         />
-
-        {/* Admin Product Catalog Routes */}
-        <Route
-          path="/admin/products"
-          element={
-            <ProtectedRoute adminOnly={true}>
-              <ProductProvider>
-                <ProductsPage />
-              </ProductProvider>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/admin/categories"
-          element={
-            <ProtectedRoute adminOnly={true}>
-              <CategoryProvider>
-                <CategoriesPage />
-              </CategoryProvider>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/admin/brands"
-          element={
-            <ProtectedRoute adminOnly={true}>
-              <BrandProvider>
-                <BrandsPage />
-              </BrandProvider>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/admin/attributes"
-          element={
-            <ProtectedRoute adminOnly={true}>
-              <AttributeProvider>
-                <AttributesPage />
-              </AttributeProvider>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/admin/media"
-          element={
-            <ProtectedRoute adminOnly={true}>
-              <CatalogProvider>
-                <MediaPage />
-              </CatalogProvider>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/admin/reviews"
-          element={
-            <ProtectedRoute adminOnly={true}>
-              <CatalogProvider>
-                <ReviewsPage />
-              </CatalogProvider>
-            </ProtectedRoute>
-          }
-        />
-
+        
+        {/* Debug page */}
         <Route path="/debug" element={<DebugPage />} />
       </Routes>
     </>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAddress } from '../../context/AddressContext';
-import { useCheckout } from '../../context/CheckoutContext';
+import { useAddressContext } from '../../context/AddressContext';
+import { useCheckoutContext } from '../../context/CheckoutContext';
 import { toastSuccess, toastWarning, toastError } from '../../utils/customToast';
 import './AddressVerification.css';
 
@@ -17,12 +17,12 @@ const AddressVerification = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const navigate = useNavigate();
-  const { addresses, getUserAddresses, createAddress, loading } = useAddress();
-  const { setVerifiedAddress, setCurrentStep } = useCheckout();
+  const { addresses, fetchUserAddresses, createAddress, loading } = useAddressContext();
+  const { setVerifiedAddress, setCurrentStep } = useCheckoutContext();
 
   useEffect(() => {
-    getUserAddresses();
-  }, [getUserAddresses]);
+    fetchUserAddresses();
+  }, [fetchUserAddresses]);
 
   // Set first address as selected when addresses load
   useEffect(() => {
@@ -117,7 +117,7 @@ const AddressVerification = () => {
   };
 
   // Show loading state when addresses are being fetched
-  if (loading.addresses) {
+  if (loading) {
     return (
       <div className="address-verification-page">
         <div className="verification-container">

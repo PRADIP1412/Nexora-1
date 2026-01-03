@@ -204,3 +204,30 @@ class CategoryProductsWrapper(SuccessWrapper):
 
 class TrendingProductsWrapper(SuccessWrapper):
     data: TrendingProductsResponse
+
+class VariantMediaImage(BaseModel):
+    image_id: int
+    url: str
+    is_default: bool
+
+    class Config:
+        orm_mode = True
+
+
+class VariantMediaVideo(BaseModel):
+    video_id: int
+    url: str
+
+    class Config:
+        orm_mode = True
+
+
+class VariantImageListWrapper(BaseModel):
+    success: bool
+    message: str
+    data: List[VariantMediaImage]
+
+class VariantVideoListWrapper(BaseModel):
+    success: bool
+    message: str
+    data: List[VariantMediaVideo]

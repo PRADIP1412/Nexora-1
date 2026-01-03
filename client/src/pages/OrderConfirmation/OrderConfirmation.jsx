@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useCheckout } from '../../context/CheckoutContext';
+import { useCheckoutContext } from '../../context/CheckoutContext';
 import { toastSuccess } from '../../utils/customToast';
 import './OrderConfirmation.css';
 
@@ -10,7 +10,7 @@ const OrderConfirmation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  const { resetCheckout } = useCheckout();
+  const { resetCheckout } = useCheckoutContext();
 
   useEffect(() => {
     // Get order data from navigation state or create mock data

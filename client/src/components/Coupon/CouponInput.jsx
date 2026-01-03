@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useCoupon } from '../../context/CouponContext';
+import { useCouponContext } from '../../context/CouponContext';
 import './CouponInput.css';
 
 const CouponInput = ({ 
@@ -12,7 +12,7 @@ const CouponInput = ({
   showLabel = true,
   compact = false 
 }) => {
-  const { validateCouponCode, isLoading } = useCoupon();
+  const { validateCouponCode, loading } = useCouponContext();
   
   const [couponCode, setCouponCode] = useState('');
   const [error, setError] = useState('');
@@ -101,13 +101,13 @@ const CouponInput = ({
             onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
             onKeyPress={handleKeyPress}
             className="coupon-input-field"
-            disabled={isLoading || isValidating}
+            disabled={loading || isValidating}
           />
         </div>
         <button
           className="apply-coupon-btn"
           onClick={handleApply}
-          disabled={isLoading || isValidating || !couponCode.trim()}
+          disabled={loading || isValidating || !couponCode.trim()}
         >
           {isValidating ? (
             <>

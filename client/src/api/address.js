@@ -1,176 +1,176 @@
-import axios from 'axios';
+import api from './api';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
-const ADDRESS_BASE_URL = `${API_URL}/address`;
+const ADDRESS_BASE_URL = `/address`;
 
-// Create axios instance with default config
-const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  timeout: 10000,
-});
+/* -----------------------------
+   ✅ ADDRESS API FUNCTIONS
+------------------------------ */
 
-// Add request interceptor to include token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Add response interceptor to handle errors
-api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
-
-export const addressAPI = {
-  // Get all states
-  getStates: async () => {
+// Get all states
+export const fetchStates = async () => {
     try {
-      const response = await api.get(`${ADDRESS_BASE_URL}/states`);
-      return { success: true, data: response.data.data };
+        const response = await api.get(`${ADDRESS_BASE_URL}/states`);
+        return { 
+            success: true, 
+            data: response.data.data,
+            message: response.data.message || "States fetched successfully"
+        };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Failed to fetch states' 
-      };
+        console.error("Fetch States Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.message || "Failed to fetch states",
+            data: []
+        };
     }
-  },
+};
 
-  // Get cities by state
-  getCitiesByState: async (stateId) => {
+// Get cities by state
+export const fetchCitiesByState = async (stateId) => {
     try {
-      const response = await api.get(`${ADDRESS_BASE_URL}/cities/${stateId}`);
-      return { success: true, data: response.data.data };
+        const response = await api.get(`${ADDRESS_BASE_URL}/cities/${stateId}`);
+        return { 
+            success: true, 
+            data: response.data.data,
+            message: response.data.message || "Cities fetched successfully"
+        };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Failed to fetch cities' 
-      };
+        console.error("Fetch Cities Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.message || "Failed to fetch cities",
+            data: []
+        };
     }
-  },
+};
 
-  // Get areas by city
-  getAreasByCity: async (cityId) => {
+// Get areas by city
+export const fetchAreasByCity = async (cityId) => {
     try {
-      const response = await api.get(`${ADDRESS_BASE_URL}/areas/${cityId}`);
-      return { success: true, data: response.data.data };
+        const response = await api.get(`${ADDRESS_BASE_URL}/areas/${cityId}`);
+        return { 
+            success: true, 
+            data: response.data.data,
+            message: response.data.message || "Areas fetched successfully"
+        };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Failed to fetch areas' 
-      };
+        console.error("Fetch Areas Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.message || "Failed to fetch areas",
+            data: []
+        };
     }
-  },
+};
 
-  // Get user addresses
-  getUserAddresses: async () => {
+// Get user addresses
+export const fetchUserAddresses = async () => {
     try {
-      const response = await api.get(`${ADDRESS_BASE_URL}/`);
-      return { success: true, data: response.data.data };
+        const response = await api.get(`${ADDRESS_BASE_URL}/`);
+        return { 
+            success: true, 
+            data: response.data.data,
+            message: response.data.message || "Addresses fetched successfully"
+        };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Failed to fetch addresses' 
-      };
+        console.error("Fetch Addresses Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.message || "Failed to fetch addresses",
+            data: []
+        };
     }
-  },
+};
 
-  // Get address by ID
-  getAddressById: async (addressId) => {
+// Get address by ID
+export const fetchAddressById = async (addressId) => {
     try {
-      const response = await api.get(`${ADDRESS_BASE_URL}/${addressId}`);
-      return { success: true, data: response.data.data };
+        const response = await api.get(`${ADDRESS_BASE_URL}/${addressId}`);
+        return { 
+            success: true, 
+            data: response.data.data,
+            message: response.data.message || "Address fetched successfully"
+        };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Failed to fetch address' 
-      };
+        console.error("Fetch Address by ID Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.message || "Failed to fetch address",
+            data: null
+        };
     }
-  },
+};
 
-  // Create address
-  createAddress: async (addressData) => {
+// Create address
+export const createAddress = async (addressData) => {
     try {
-      const response = await api.post(`${ADDRESS_BASE_URL}/`, addressData);
-      return { 
-        success: true, 
-        data: response.data.data,
-        message: 'Address created successfully'
-      };
+        const response = await api.post(`${ADDRESS_BASE_URL}/`, addressData);
+        return { 
+            success: true, 
+            data: response.data.data,
+            message: response.data.message || "Address created successfully"
+        };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Failed to create address' 
-      };
+        console.error("Create Address Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.message || "Failed to create address",
+            data: null
+        };
     }
-  },
+};
 
-  // Update address
-  updateAddress: async (addressId, updateData) => {
+// Update address
+export const updateAddress = async (addressId, updateData) => {
     try {
-      const response = await api.put(`${ADDRESS_BASE_URL}/${addressId}`, updateData);
-      return { 
-        success: true, 
-        data: response.data.data,
-        message: 'Address updated successfully'
-      };
+        const response = await api.put(`${ADDRESS_BASE_URL}/${addressId}`, updateData);
+        return { 
+            success: true, 
+            data: response.data.data,
+            message: response.data.message || "Address updated successfully"
+        };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Failed to update address' 
-      };
+        console.error("Update Address Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.message || "Failed to update address",
+            data: null
+        };
     }
-  },
+};
 
-  // Delete address
-  deleteAddress: async (addressId) => {
+// Delete address
+export const deleteAddress = async (addressId) => {
     try {
-      const response = await api.delete(`${ADDRESS_BASE_URL}/${addressId}`);
-      return { 
-        success: true, 
-        message: response.data.message || 'Address deleted successfully'
-      };
+        const response = await api.delete(`${ADDRESS_BASE_URL}/${addressId}`);
+        return { 
+            success: true, 
+            message: response.data.message || "Address deleted successfully"
+        };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Failed to delete address' 
-      };
+        console.error("Delete Address Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.message || "Failed to delete address"
+        };
     }
-  },
+};
 
-  // Set default address
-  setDefaultAddress: async (addressId) => {
+// Set default address
+export const setDefaultAddress = async (addressId) => {
     try {
-      const response = await api.patch(`${ADDRESS_BASE_URL}/${addressId}/default`);
-      return { 
-        success: true, 
-        data: response.data.data,
-        message: 'Default address set successfully'
-      };
+        const response = await api.patch(`${ADDRESS_BASE_URL}/${addressId}/default`);
+        return { 
+            success: true, 
+            data: response.data.data,
+            message: response.data.message || "Default address set successfully"
+        };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Failed to set default address' 
-      };
+        console.error("Set Default Address Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.message || "Failed to set default address",
+            data: null
+        };
     }
-  }
 };

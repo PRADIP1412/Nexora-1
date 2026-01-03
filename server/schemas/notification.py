@@ -6,7 +6,8 @@ from enum import Enum
 class NotificationType(str, Enum):
     ORDER = "ORDER"
     PAYMENT = "PAYMENT"
-    DELIVERY = "DELIVERY" 
+    DELIVERY = "DELIVERY"
+    DELIVERY_OFFER = "DELIVERY_OFFER"
     OFFER = "OFFER"
     FEEDBACK = "FEEDBACK"
     SYSTEM = "SYSTEM"

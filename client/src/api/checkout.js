@@ -1,244 +1,242 @@
-import axios from 'axios';
+import api from './api';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 const CHECKOUT_BASE_URL = `/checkout`;
+const PAYMENTS_BASE_URL = `/payments`;
 
-// Create axios instance with default config
-const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  timeout: 10000,
-});
+/* -----------------------------
+   ✅ CHECKOUT API FUNCTIONS
+------------------------------ */
 
-// Add request interceptor to include token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Add response interceptor to handle errors
-api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
-
-export const checkoutAPI = {
-  // Initiate checkout
-  initiateCheckout: async (addressId) => {
+// Initiate checkout
+export const initiateCheckout = async (addressId) => {
     try {
-      const response = await api.get(`${CHECKOUT_BASE_URL}/initiate/${addressId}`);
-      return { success: true, data: response.data };
+        const response = await api.get(`${CHECKOUT_BASE_URL}/initiate/${addressId}`);
+        return { 
+            success: true, 
+            data: response.data.data || response.data,
+            message: response.data.message || "Checkout initiated successfully"
+        };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.detail || 'Failed to initiate checkout' 
-      };
+        console.error("Initiate Checkout Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.detail || "Failed to initiate checkout",
+            data: null
+        };
     }
-  },
+};
 
-  // Confirm checkout
-  confirmCheckout: async (checkoutData) => {
+// Confirm checkout
+export const confirmCheckout = async (checkoutData) => {
     try {
-      const response = await api.post(`${CHECKOUT_BASE_URL}/confirm`, checkoutData);
-      return { 
-        success: true, 
-        data: response.data,
-        message: 'Order placed successfully'
-      };
+        const response = await api.post(`${CHECKOUT_BASE_URL}/confirm`, checkoutData);
+        return { 
+            success: true, 
+            data: response.data.data || response.data,
+            message: response.data.message || "Order placed successfully"
+        };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.detail || 'Failed to confirm checkout' 
-      };
+        console.error("Confirm Checkout Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.detail || "Failed to confirm checkout",
+            data: null
+        };
     }
-  },
+};
 
-  // Get payment methods
-  getPaymentMethods: async () => {
+// Get payment methods
+export const fetchPaymentMethods = async () => {
     try {
-      const response = await api.get(`${API_URL}/payments/methods`);
-      return { success: true, data: response.data.data };
+        const response = await api.get(`${PAYMENTS_BASE_URL}/methods`);
+        return { 
+            success: true, 
+            data: response.data.data,
+            message: response.data.message || "Payment methods fetched successfully"
+        };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Failed to fetch payment methods' 
-      };
+        console.error("Fetch Payment Methods Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.message || "Failed to fetch payment methods",
+            data: []
+        };
     }
-  },
+};
 
-  // Process payment
-  processPayment: async (paymentData) => {
+// Process payment
+export const processPayment = async (paymentData) => {
     try {
-      const response = await api.post(`${API_URL}/payments/process`, paymentData);
-      return { 
-        success: true, 
-        data: response.data.data || response.data,
-        message: response.data.message || 'Payment processed successfully'
-      };
+        const response = await api.post(`${PAYMENTS_BASE_URL}/process`, paymentData);
+        return { 
+            success: true, 
+            data: response.data.data || response.data,
+            message: response.data.message || "Payment processed successfully"
+        };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.detail || error.response?.data?.message || 'Failed to process payment' 
-      };
+        console.error("Process Payment Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.detail || error.response?.data?.message || "Failed to process payment",
+            data: null
+        };
     }
-  },
+};
 
-  // Validate checkout
-  validateCheckout: async (checkoutData) => {
+// Validate checkout
+export const validateCheckout = async (checkoutData) => {
     try {
-      const response = await api.post(`${CHECKOUT_BASE_URL}/validate`, checkoutData);
-      return { 
-        success: true, 
-        data: response.data.data || response.data,
-        isValid: response.data.data?.is_valid || response.data.is_valid,
-        errors: response.data.data?.errors || response.data.errors || []
-      };
+        const response = await api.post(`${CHECKOUT_BASE_URL}/validate`, checkoutData);
+        return { 
+            success: true, 
+            data: response.data.data || response.data,
+            message: response.data.message || "Checkout validated successfully"
+        };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.detail || 'Failed to validate checkout' 
-      };
+        console.error("Validate Checkout Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.detail || "Failed to validate checkout",
+            data: null
+        };
     }
-  },
+};
 
-  // Get order summary
-  getOrderSummary: async (orderId) => {
+// Get order summary
+export const fetchOrderSummary = async (orderId) => {
     try {
-      const response = await api.get(`${CHECKOUT_BASE_URL}/orders/${orderId}/summary`);
-      return { 
-        success: true, 
-        data: response.data.data || response.data
-      };
+        const response = await api.get(`${CHECKOUT_BASE_URL}/orders/${orderId}/summary`);
+        return { 
+            success: true, 
+            data: response.data.data || response.data,
+            message: response.data.message || "Order summary fetched successfully"
+        };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.detail || 'Failed to fetch order summary' 
-      };
+        console.error("Fetch Order Summary Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.detail || "Failed to fetch order summary",
+            data: null
+        };
     }
-  },
+};
 
-  // Apply coupon
-  applyCoupon: async (couponCode) => {
+// Apply coupon
+export const applyCoupon = async (couponCode) => {
     try {
-      const response = await api.post(`${CHECKOUT_BASE_URL}/apply-coupon`, {
-        coupon_code: couponCode
-      });
-      return { 
-        success: true, 
-        data: response.data.data || response.data,
-        message: response.data.message || 'Coupon applied successfully'
-      };
+        const response = await api.post(`${CHECKOUT_BASE_URL}/apply-coupon`, {
+            coupon_code: couponCode
+        });
+        return { 
+            success: true, 
+            data: response.data.data || response.data,
+            message: response.data.message || "Coupon applied successfully"
+        };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.detail || error.response?.data?.message || 'Failed to apply coupon' 
-      };
+        console.error("Apply Coupon Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.detail || error.response?.data?.message || "Failed to apply coupon",
+            data: null
+        };
     }
-  },
+};
 
-  // Remove coupon
-  removeCoupon: async () => {
+// Remove coupon
+export const removeCoupon = async () => {
     try {
-      const response = await api.delete(`${CHECKOUT_BASE_URL}/remove-coupon`);
-      return { 
-        success: true, 
-        data: response.data.data || response.data,
-        message: response.data.message || 'Coupon removed successfully'
-      };
+        const response = await api.delete(`${CHECKOUT_BASE_URL}/remove-coupon`);
+        return { 
+            success: true, 
+            data: response.data.data || response.data,
+            message: response.data.message || "Coupon removed successfully"
+        };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.detail || error.response?.data?.message || 'Failed to remove coupon' 
-      };
+        console.error("Remove Coupon Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.detail || error.response?.data?.message || "Failed to remove coupon",
+            data: null
+        };
     }
-  },
+};
 
-  // Get shipping methods
-  getShippingMethods: async (addressId) => {
+// Get shipping methods
+export const fetchShippingMethods = async (addressId) => {
     try {
-      const response = await api.get(`${CHECKOUT_BASE_URL}/shipping-methods/${addressId}`);
-      return { 
-        success: true, 
-        data: response.data.data || response.data
-      };
+        const response = await api.get(`${CHECKOUT_BASE_URL}/shipping-methods/${addressId}`);
+        return { 
+            success: true, 
+            data: response.data.data || response.data,
+            message: response.data.message || "Shipping methods fetched successfully"
+        };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.detail || 'Failed to fetch shipping methods' 
-      };
+        console.error("Fetch Shipping Methods Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.detail || "Failed to fetch shipping methods",
+            data: []
+        };
     }
-  },
+};
 
-  // Update shipping method
-  updateShippingMethod: async (shippingMethodId) => {
+// Update shipping method
+export const updateShippingMethod = async (shippingMethodId) => {
     try {
-      const response = await api.post(`${CHECKOUT_BASE_URL}/update-shipping`, {
-        shipping_method_id: shippingMethodId
-      });
-      return { 
-        success: true, 
-        data: response.data.data || response.data,
-        message: response.data.message || 'Shipping method updated successfully'
-      };
+        const response = await api.post(`${CHECKOUT_BASE_URL}/update-shipping`, {
+            shipping_method_id: shippingMethodId
+        });
+        return { 
+            success: true, 
+            data: response.data.data || response.data,
+            message: response.data.message || "Shipping method updated successfully"
+        };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.detail || error.response?.data?.message || 'Failed to update shipping method' 
-      };
+        console.error("Update Shipping Method Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.detail || error.response?.data?.message || "Failed to update shipping method",
+            data: null
+        };
     }
-  },
+};
 
-  // Get checkout details
-  getCheckoutDetails: async () => {
+// Get checkout details
+export const fetchCheckoutDetails = async () => {
     try {
-      const response = await api.get(`${CHECKOUT_BASE_URL}/details`);
-      return { 
-        success: true, 
-        data: response.data.data || response.data
-      };
+        const response = await api.get(`${CHECKOUT_BASE_URL}/details`);
+        return { 
+            success: true, 
+            data: response.data.data || response.data,
+            message: response.data.message || "Checkout details fetched successfully"
+        };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.detail || 'Failed to fetch checkout details' 
-      };
+        console.error("Fetch Checkout Details Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.detail || "Failed to fetch checkout details",
+            data: null
+        };
     }
-  },
+};
 
-  // Update checkout address
-  updateCheckoutAddress: async (addressId) => {
+// Update checkout address
+export const updateCheckoutAddress = async (addressId) => {
     try {
-      const response = await api.post(`${CHECKOUT_BASE_URL}/update-address`, {
-        address_id: addressId
-      });
-      return { 
-        success: true, 
-        data: response.data.data || response.data,
-        message: response.data.message || 'Address updated successfully'
-      };
+        const response = await api.post(`${CHECKOUT_BASE_URL}/update-address`, {
+            address_id: addressId
+        });
+        return { 
+            success: true, 
+            data: response.data.data || response.data,
+            message: response.data.message || "Address updated successfully"
+        };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.detail || error.response?.data?.message || 'Failed to update address' 
-      };
+        console.error("Update Checkout Address Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.detail || error.response?.data?.message || "Failed to update address",
+            data: null
+        };
     }
-  }
 };

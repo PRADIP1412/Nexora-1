@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useCart } from '../../context/CartContext';
-import { useCoupon } from '../../context/CouponContext';
+import { useCartContext } from '../../context/CartContext';
+import { useCouponContext } from '../../context/CouponContext';
 import ApplyCouponModal from '../Coupon/ApplyCouponModal';
 import ActiveCouponBadge from '../Coupon/ActiveCouponBadge';
 import './CheckoutCouponSection.css';
 
 const CheckoutCouponSection = ({ appliedCoupon, onCouponApplied, onCouponRemoved }) => {
-  const { cart } = useCart();
-  const { activeCoupons } = useCoupon();
+  const { cart } = useCartContext();
+  const { activeCoupons } = useCouponContext();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   

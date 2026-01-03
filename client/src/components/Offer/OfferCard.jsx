@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useOffer } from '../../context/OfferContext';
+import { useOfferContext } from '../../context/OfferContext';
 import './OfferCard.css';
 
 const OfferCard = ({ offer, onApply, showActions = true, compact = false }) => {
-  const { formatDiscountText } = useOffer();
+  const { formatDiscountText } = useOfferContext();
   
   const now = new Date();
   const startDate = new Date(offer.start_date);

@@ -113,3 +113,44 @@ class ReviewService:
             "images": review.images,
             "created_at": review.created_at
         }
+        # ADMIN: Fetch all reviews
+    def fetch_all_reviews(self, page: int = 1, per_page: int = 10):
+        result = self.repository.fetch_all_reviews(self.db, page, per_page)
+        result["items"] = [self._serialize_review(r) for r in result["items"]]
+        return result
+
+
+    # ADMIN: Update review status
+    def update_review_status(self, review_id: int, status: str):
+        updated = self.repository.update_review_status(self.db, review_id, status)
+        if not updated:
+            raise HTTPException(status_code=404, detail="Review not found")
+        return self._serialize_review(updated)
+
+
+    # ADMIN: Add reply
+    def add_admin_reply(self, admin_id: int, review_id: int, body: str):
+        reply = self.repository.add_admin_reply(self.db, review_id, admin_id, body)
+        return {
+            "reply_id": reply.reply_id,
+            "review_id": reply.review_id,
+            "body": reply.body,
+            "user_id": reply.user_id,
+            "created_at": reply.created_at
+        }
+
+
+    # ADMIN: Delete reply
+    def delete_reply(self, reply_id: int):
+        success = self.repository.delete_reply(self.db, reply_id)
+        if not success:
+            raise HTTPException(status_code=404, detail="Reply not found")
+        return {"message": "Reply deleted successfully"}
+
+
+    # ADMIN: Hard delete review
+    def admin_delete_review(self, review_id: int):
+        success = self.repository.admin_delete_review(self.db, review_id)
+        if not success:
+            raise HTTPException(status_code=404, detail="Review not found")
+        return {"message": "Review deleted successfully (Admin)"}

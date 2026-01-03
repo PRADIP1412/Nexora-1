@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useWishlist } from "../../context/WishlistContext";
-import { useCart } from "../../context/CartContext";
+import { useWishlistContext } from "../../context/WishlistContext";
+import { useCartContext } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
-import { getActiveOffers } from "../../api/offer"; // Make sure this API exists
+import { fetchActiveOffers } from "../../api/offer"; // Changed from getActiveOffers
 import { toast } from 'react-toastify';
 import "./ProductCard.css";
 
@@ -22,8 +22,8 @@ const ProductCard = ({
 }) => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const { isInWishlist, addItemToWishlist, removeItemFromWishlist } = useWishlist();
-  const { addItemToCart, isInCart, getItemQuantity } = useCart();
+  const { addItemToWishlist, removeItemFromWishlist, isInWishlist } = useWishlistContext(); // Changed to useWishlistContext
+  const { addItemToCart, isInCart, getItemQuantity } = useCartContext(); // Changed to useCartContext
   const [isWishlistLoading, setIsWishlistLoading] = useState(false);
   const [bestOffer, setBestOffer] = useState(null);
   const [finalPrice, setFinalPrice] = useState(price);
@@ -32,9 +32,9 @@ const ProductCard = ({
     // Load offers for this product variant
     const loadOffers = async () => {
       try {
-        const response = await getActiveOffers();
-        if (response.success) {
-          const offers = response.data || [];
+        const result = await fetchActiveOffers(); // Changed from getActiveOffers
+        if (result.success) {
+          const offers = result.data || [];
           // Find offers applicable to this variant
           const applicableOffers = offers.filter(offer => 
             !offer.variants || offer.variants.length === 0 || offer.variants.includes(variantId)
@@ -96,6 +96,7 @@ const ProductCard = ({
     }
 
     try {
+      console.log('Attempting cart operation for variantId:', variantId);
       const result = await addItemToCart(variantId, 1);
       if (result.success) {
         toast.success("Added to cart!");
@@ -121,19 +122,26 @@ const ProductCard = ({
 
     setIsWishlistLoading(true);
     
+    console.log('Attempting wishlist operation for variantId:', variantId);
+    console.log('Current wishlist items:', isInWishlist(variantId));
+    
     try {
       if (isInWishlist(variantId)) {
+        console.log('Removing from wishlist:', variantId);
         const result = await removeItemFromWishlist(variantId);
         if (result.success) {
           toast.success("Removed from wishlist!");
         } else {
+          console.error('Remove wishlist error:', result);
           toast.error(result.message || "Failed to remove from wishlist");
         }
       } else {
+        console.log('Adding to wishlist:', variantId);
         const result = await addItemToWishlist(variantId);
         if (result.success) {
           toast.success("Added to wishlist!");
         } else {
+          console.error('Add wishlist error:', result);
           toast.error(result.message || "Failed to add to wishlist");
         }
       }

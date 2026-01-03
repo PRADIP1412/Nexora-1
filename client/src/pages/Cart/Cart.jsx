@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCart } from '../../context/CartContext';
+import { useCartContext } from '../../context/CartContext'; // Changed from useCart
 import { useAuth } from '../../context/AuthContext';
-import { getActiveCoupons } from '../../api/coupon'; // Import the coupon API
+import { fetchActiveCoupons } from '../../api/coupon'; // Changed from getActiveCoupons
 import './Cart.css';
 import { toastSuccess, toastError, toastWarning, toastInfo } from '../../utils/customToast';
 
@@ -10,7 +10,7 @@ const Cart = () => {
     const navigate = useNavigate();
     const { 
         cart, 
-        isCartLoading, 
+        loading, // Changed from isCartLoading
         updateItemQuantity, 
         removeItemFromCart, 
         clearUserCart, 
@@ -21,7 +21,7 @@ const Cart = () => {
         applyCouponToCart,
         removeCoupon,
         getCartTotals
-    } = useCart();
+    } = useCartContext(); // Changed to useCartContext
     const { isAuthenticated } = useAuth();
     
     const [updatingItems, setUpdatingItems] = useState(new Set());
@@ -40,9 +40,9 @@ const Cart = () => {
 
     const loadAvailableCoupons = async () => {
         try {
-            const response = await getActiveCoupons();
-            if (response.success) {
-                setAvailableCoupons(response.data || []);
+            const result = await fetchActiveCoupons(); // Changed from getActiveCoupons
+            if (result.success) {
+                setAvailableCoupons(result.data || []);
             }
         } catch (error) {
             console.error('Failed to load coupons:', error);
@@ -198,7 +198,7 @@ const Cart = () => {
         );
     }
 
-    if (isCartLoading && (!cart.items || cart.items.length === 0)) {
+    if (loading && (!cart.items || cart.items.length === 0)) {
         return (
             <div className="cart-page">
                 <div className="loading-container">

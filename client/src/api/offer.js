@@ -1,107 +1,140 @@
-import axios from 'axios';
+import api from './api';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
-const OFFER_BASE_URL = `${API_URL}/marketing/offers`;
+const OFFER_BASE_URL = `/marketing/offers`;
 
-const api = axios.create({
-  baseURL: API_URL,
-});
+/* -----------------------------
+   ✅ OFFER API FUNCTIONS
+------------------------------ */
 
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+// Public: Get active offers
+export const fetchActiveOffers = async () => {
+    try {
+        const response = await api.get(`${OFFER_BASE_URL}/active`);
+        return { 
+            success: true, 
+            data: response.data.data,
+            message: response.data.message || "Active offers fetched successfully"
+        };
+    } catch (error) {
+        console.error("Fetch Active Offers Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.detail || "Failed to load active offers",
+            data: []
+        };
     }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+};
 
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+// Admin: Get all offers
+export const fetchAllOffers = async (skip = 0, limit = 100) => {
+    try {
+        const response = await api.get(OFFER_BASE_URL, {
+            params: { skip, limit }
+        });
+        return { 
+            success: true, 
+            data: response.data.data,
+            message: response.data.message || "Offers fetched successfully"
+        };
+    } catch (error) {
+        console.error("Fetch All Offers Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.detail || "Failed to load offers",
+            data: []
+        };
     }
-    return Promise.reject(error);
-  }
-);
-
-// Public endpoints
-export const getActiveOffers = async () => {
-  try {
-    const response = await api.get(`${OFFER_BASE_URL}/active`);
-    return { success: true, data: response.data.data };
-  } catch (error) {
-    const message = error.response?.data?.detail || "Failed to load active offers.";
-    return { success: false, message };
-  }
 };
 
-// Admin endpoints
-export const getAllOffers = async (skip = 0, limit = 100) => {
-  try {
-    const response = await api.get(OFFER_BASE_URL, {
-      params: { skip, limit }
-    });
-    return { success: true, data: response.data.data };
-  } catch (error) {
-    const message = error.response?.data?.detail || "Failed to load offers.";
-    return { success: false, message };
-  }
+// Admin: Get offer by ID
+export const fetchOfferById = async (offerId) => {
+    try {
+        const response = await api.get(`${OFFER_BASE_URL}/${offerId}`);
+        return { 
+            success: true, 
+            data: response.data.data,
+            message: response.data.message || "Offer fetched successfully"
+        };
+    } catch (error) {
+        console.error("Fetch Offer by ID Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.detail || "Failed to load offer",
+            data: null
+        };
+    }
 };
 
-export const getOfferById = async (offerId) => {
-  try {
-    const response = await api.get(`${OFFER_BASE_URL}/${offerId}`);
-    return { success: true, data: response.data.data };
-  } catch (error) {
-    const message = error.response?.data?.detail || "Failed to load offer.";
-    return { success: false, message };
-  }
-};
-
+// Admin: Create offer
 export const createOffer = async (offerData) => {
-  try {
-    const response = await api.post(OFFER_BASE_URL, offerData);
-    return { success: true, data: response.data.data, message: response.data.message };
-  } catch (error) {
-    const message = error.response?.data?.detail || "Failed to create offer.";
-    return { success: false, message };
-  }
+    try {
+        const response = await api.post(OFFER_BASE_URL, offerData);
+        return { 
+            success: true, 
+            data: response.data.data,
+            message: response.data.message || "Offer created successfully"
+        };
+    } catch (error) {
+        console.error("Create Offer Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.detail || "Failed to create offer",
+            data: null
+        };
+    }
 };
 
+// Admin: Update offer
 export const updateOffer = async (offerId, offerData) => {
-  try {
-    const response = await api.patch(`${OFFER_BASE_URL}/${offerId}`, offerData);
-    return { success: true, data: response.data.data, message: response.data.message };
-  } catch (error) {
-    const message = error.response?.data?.detail || "Failed to update offer.";
-    return { success: false, message };
-  }
+    try {
+        const response = await api.patch(`${OFFER_BASE_URL}/${offerId}`, offerData);
+        return { 
+            success: true, 
+            data: response.data.data,
+            message: response.data.message || "Offer updated successfully"
+        };
+    } catch (error) {
+        console.error("Update Offer Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.detail || "Failed to update offer",
+            data: null
+        };
+    }
 };
 
+// Admin: Update offer status
 export const updateOfferStatus = async (offerId, isActive) => {
-  try {
-    const response = await api.patch(`${OFFER_BASE_URL}/${offerId}/status`, {
-      is_active: isActive
-    });
-    return { success: true, message: response.data.message };
-  } catch (error) {
-    const message = error.response?.data?.detail || "Failed to update offer status.";
-    return { success: false, message };
-  }
+    try {
+        const response = await api.patch(`${OFFER_BASE_URL}/${offerId}/status`, {
+            is_active: isActive
+        });
+        return { 
+            success: true, 
+            message: response.data.message || "Offer status updated successfully"
+        };
+    } catch (error) {
+        console.error("Update Offer Status Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.detail || "Failed to update offer status"
+        };
+    }
 };
 
+// Admin: Delete offer
 export const deleteOffer = async (offerId) => {
-  try {
-    const response = await api.delete(`${OFFER_BASE_URL}/${offerId}`);
-    return { success: true, message: response.data.message };
-  } catch (error) {
-    const message = error.response?.data?.detail || "Failed to delete offer.";
-    return { success: false, message };
-  }
+    try {
+        const response = await api.delete(`${OFFER_BASE_URL}/${offerId}`);
+        return { 
+            success: true, 
+            message: response.data.message || "Offer deleted successfully"
+        };
+    } catch (error) {
+        console.error("Delete Offer Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.detail || "Failed to delete offer"
+        };
+    }
 };

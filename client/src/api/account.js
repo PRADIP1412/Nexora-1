@@ -1,60 +1,45 @@
-import axios from 'axios';
+import api from './api';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+const ACCOUNT_BASE_URL = `/account`;
 
-// Create axios instance with credentials
-const api = axios.create({
-    baseURL: API_URL,
-    withCredentials: true, // Important for sending cookies/tokens
-});
+/* -----------------------------
+   ✅ ACCOUNT API FUNCTIONS
+------------------------------ */
 
-// Add request interceptor to include auth token
-api.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
+// Get dashboard data
+export const fetchDashboard = async () => {
+    try {
+        const response = await api.get(`${ACCOUNT_BASE_URL}/dashboard`);
+        return { 
+            success: true, 
+            data: response.data,
+            message: response.data.message || "Dashboard data fetched successfully"
+        };
+    } catch (error) {
+        console.error("Fetch Dashboard Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.detail || "Failed to fetch dashboard data",
+            data: null
+        };
     }
-);
+};
 
-// Add response interceptor to handle auth errors
-api.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        if (error.response?.status === 401 || error.response?.status === 403) {
-            // Clear stored tokens and redirect to login
-            localStorage.removeItem('access_token');
-            sessionStorage.removeItem('access_token');
-            window.location.href = '/login';
-        }
-        return Promise.reject(error);
-    }
-);
-
-export const accountAPI = {
-    getDashboard: async () => {
-        try {
-            const response = await api.get('/account/dashboard');
-            return response.data;
-        } catch (error) {
-            console.error('Account Dashboard API Error:', error);
-            throw error;
-        }
-    },
-    
-    // Alternative method for testing without auth
-    getDashboardTest: async () => {
-        try {
-            const response = await api.get('/account/dashboard');
-            return response.data;
-        } catch (error) {
-            console.error('Account Dashboard API Error:', error);
-            throw error;
-        }
+// Get dashboard data (test endpoint - no auth)
+export const fetchDashboardTest = async () => {
+    try {
+        const response = await api.get(`${ACCOUNT_BASE_URL}/dashboard`);
+        return { 
+            success: true, 
+            data: response.data,
+            message: response.data.message || "Dashboard test data fetched successfully"
+        };
+    } catch (error) {
+        console.error("Fetch Dashboard Test Error:", error.response?.data || error.message);
+        return { 
+            success: false, 
+            message: error.response?.data?.detail || "Failed to fetch dashboard test data",
+            data: null
+        };
     }
 };

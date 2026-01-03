@@ -1,0 +1,845 @@
+/* 
+ * Variant Status Badge Component CSS
+ * Advanced styling for status badges with visual hierarchy and animations
+ * Total lines: 583
+ */
+
+/* ===== ROOT VARIABLES ===== */
+.variant-status-badge {
+  /* Extended Color Palette */
+  --vsb-green-50: #f0fdf4;
+  --vsb-green-100: #dcfce7;
+  --vsb-green-200: #bbf7d0;
+  --vsb-green-300: #86efac;
+  --vsb-green-400: #4ade80;
+  --vsb-green-500: #22c55e;
+  --vsb-green-600: #16a34a;
+  --vsb-green-700: #15803d;
+  --vsb-green-800: #166534;
+  --vsb-green-900: #14532d;
+  --vsb-green-950: #052e16;
+  
+  --vsb-red-50: #fef2f2;
+  --vsb-red-100: #fee2e2;
+  --vsb-red-200: #fecaca;
+  --vsb-red-300: #fca5a5;
+  --vsb-red-400: #f87171;
+  --vsb-red-500: #ef4444;
+  --vsb-red-600: #dc2626;
+  --vsb-red-700: #b91c1c;
+  --vsb-red-800: #991b1b;
+  --vsb-red-900: #7f1d1d;
+  --vsb-red-950: #450a0a;
+  
+  --vsb-yellow-50: #fffbeb;
+  --vsb-yellow-100: #fef3c7;
+  --vsb-yellow-200: #fde68a;
+  --vsb-yellow-300: #fcd34d;
+  --vsb-yellow-400: #fbbf24;
+  --vsb-yellow-500: #f59e0b;
+  --vsb-yellow-600: #d97706;
+  --vsb-yellow-700: #b45309;
+  --vsb-yellow-800: #92400e;
+  --vsb-yellow-900: #78350f;
+  --vsb-yellow-950: #451a03;
+  
+  --vsb-blue-50: #eff6ff;
+  --vsb-blue-100: #dbeafe;
+  --vsb-blue-200: #bfdbfe;
+  --vsb-blue-300: #93c5fd;
+  --vsb-blue-400: #60a5fa;
+  --vsb-blue-500: #3b82f6;
+  --vsb-blue-600: #2563eb;
+  --vsb-blue-700: #1d4ed8;
+  --vsb-blue-800: #1e40af;
+  --vsb-blue-900: #1e3a8a;
+  --vsb-blue-950: #172554;
+  
+  --vsb-purple-50: #faf5ff;
+  --vsb-purple-100: #f3e8ff;
+  --vsb-purple-200: #e9d5ff;
+  --vsb-purple-300: #d8b4fe;
+  --vsb-purple-400: #c084fc;
+  --vsb-purple-500: #a855f7;
+  --vsb-purple-600: #9333ea;
+  --vsb-purple-700: #7e22ce;
+  --vsb-purple-800: #6b21a8;
+  --vsb-purple-900: #581c87;
+  --vsb-purple-950: #3b0764;
+  
+  --vsb-indigo-50: #eef2ff;
+  --vsb-indigo-100: #e0e7ff;
+  --vsb-indigo-200: #c7d2fe;
+  --vsb-indigo-300: #a5b4fc;
+  --vsb-indigo-400: #818cf8;
+  --vsb-indigo-500: #6366f1;
+  --vsb-indigo-600: #4f46e5;
+  --vsb-indigo-700: #4338ca;
+  --vsb-indigo-800: #3730a3;
+  --vsb-indigo-900: #312e81;
+  --vsb-indigo-950: #1e1b4b;
+  
+  --vsb-gray-50: #f9fafb;
+  --vsb-gray-100: #f3f4f6;
+  --vsb-gray-200: #e5e7eb;
+  --vsb-gray-300: #d1d5db;
+  --vsb-gray-400: #9ca3af;
+  --vsb-gray-500: #6b7280;
+  --vsb-gray-600: #4b5563;
+  --vsb-gray-700: #374151;
+  --vsb-gray-800: #1f2937;
+  --vsb-gray-900: #111827;
+  --vsb-gray-950: #030712;
+  
+  /* Semantic Colors */
+  --vsb-success: var(--vsb-green-500);
+  --vsb-error: var(--vsb-red-500);
+  --vsb-warning: var(--vsb-yellow-500);
+  --vsb-info: var(--vsb-blue-500);
+  --vsb-neutral: var(--vsb-gray-500);
+  
+  /* Gradients */
+  --vsb-gradient-success: linear-gradient(135deg, var(--vsb-green-400) 0%, var(--vsb-green-600) 100%);
+  --vsb-gradient-error: linear-gradient(135deg, var(--vsb-red-400) 0%, var(--vsb-red-600) 100%);
+  --vsb-gradient-warning: linear-gradient(135deg, var(--vsb-yellow-400) 0%, var(--vsb-yellow-600) 100%);
+  --vsb-gradient-info: linear-gradient(135deg, var(--vsb-blue-400) 0%, var(--vsb-blue-600) 100%);
+  --vsb-gradient-neutral: linear-gradient(135deg, var(--vsb-gray-400) 0%, var(--vsb-gray-600) 100%);
+  --vsb-gradient-outline: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.1) 100%);
+  
+  /* Shadows */
+  --vsb-shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --vsb-shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --vsb-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --vsb-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --vsb-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --vsb-shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+  --vsb-shadow-glow-success: 0 0 20px rgba(34, 197, 94, 0.3);
+  --vsb-shadow-glow-error: 0 0 20px rgba(239, 68, 68, 0.3);
+  --vsb-shadow-glow-warning: 0 0 20px rgba(245, 158, 11, 0.3);
+  
+  /* Transitions */
+  --vsb-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --vsb-transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --vsb-transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  --vsb-transition-bounce: 400ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  /* Border Radius */
+  --vsb-radius-sm: 0.25rem;
+  --vsb-radius-md: 0.375rem;
+  --vsb-radius-lg: 0.5rem;
+  --vsb-radius-xl: 0.75rem;
+  --vsb-radius-2xl: 1rem;
+  --vsb-radius-full: 9999px;
+  
+  /* Animations */
+  --vsb-pulse-duration: 2s;
+}
+
+/* ===== BASE STYLES ===== */
+.vsb-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.875rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  vertical-align: middle;
+  user-select: none;
+  cursor: default;
+  border: 1px solid transparent;
+  border-radius: var(--vsb-radius-full);
+  transition: all var(--vsb-transition-normal);
+  position: relative;
+  overflow: hidden;
+  animation: vsb-fade-in 300ms ease-out;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes vsb-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ===== STATUS VARIANTS ===== */
+
+/* Active Status */
+.vsb-badge-active {
+  background: linear-gradient(135deg, var(--vsb-green-100) 0%, var(--vsb-green-50) 100%);
+  color: var(--vsb-green-800);
+  border-color: var(--vsb-green-200);
+  box-shadow: var(--vsb-shadow-xs);
+}
+
+.vsb-badge-active:hover {
+  background: linear-gradient(135deg, var(--vsb-green-200) 0%, var(--vsb-green-100) 100%);
+  border-color: var(--vsb-green-300);
+  box-shadow: var(--vsb-shadow-sm);
+  transform: translateY(-1px);
+}
+
+.vsb-badge-active.vsb-badge-pulse {
+  animation: vsb-pulse-green var(--vsb-pulse-duration) cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes vsb-pulse-green {
+  0%, 100% {
+    box-shadow: var(--vsb-shadow-sm), var(--vsb-shadow-glow-success);
+  }
+  50% {
+    box-shadow: var(--vsb-shadow-sm);
+  }
+}
+
+.vsb-badge-active::before {
+  background: linear-gradient(135deg, var(--vsb-green-500) 0%, var(--vsb-green-700) 100%);
+}
+
+/* Inactive Status */
+.vsb-badge-inactive {
+  background: linear-gradient(135deg, var(--vsb-gray-100) 0%, var(--vsb-gray-50) 100%);
+  color: var(--vsb-gray-800);
+  border-color: var(--vsb-gray-200);
+  box-shadow: var(--vsb-shadow-xs);
+}
+
+.vsb-badge-inactive:hover {
+  background: linear-gradient(135deg, var(--vsb-gray-200) 0%, var(--vsb-gray-100) 100%);
+  border-color: var(--vsb-gray-300);
+  box-shadow: var(--vsb-shadow-sm);
+  transform: translateY(-1px);
+}
+
+.vsb-badge-inactive::before {
+  background: linear-gradient(135deg, var(--vsb-gray-500) 0%, var(--vsb-gray-700) 100%);
+}
+
+/* Out of Stock Status */
+.vsb-badge-out-of-stock {
+  background: linear-gradient(135deg, var(--vsb-red-100) 0%, var(--vsb-red-50) 100%);
+  color: var(--vsb-red-800);
+  border-color: var(--vsb-red-200);
+  box-shadow: var(--vsb-shadow-xs);
+}
+
+.vsb-badge-out-of-stock:hover {
+  background: linear-gradient(135deg, var(--vsb-red-200) 0%, var(--vsb-red-100) 100%);
+  border-color: var(--vsb-red-300);
+  box-shadow: var(--vsb-shadow-sm);
+  transform: translateY(-1px);
+}
+
+.vsb-badge-out-of-stock.vsb-badge-pulse {
+  animation: vsb-pulse-red var(--vsb-pulse-duration) cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes vsb-pulse-red {
+  0%, 100% {
+    box-shadow: var(--vsb-shadow-sm), var(--vsb-shadow-glow-error);
+  }
+  50% {
+    box-shadow: var(--vsb-shadow-sm);
+  }
+}
+
+.vsb-badge-out-of-stock::before {
+  background: linear-gradient(135deg, var(--vsb-red-500) 0%, var(--vsb-red-700) 100%);
+}
+
+/* Additional Status Variants */
+.vsb-badge-draft {
+  background: linear-gradient(135deg, var(--vsb-yellow-100) 0%, var(--vsb-yellow-50) 100%);
+  color: var(--vsb-yellow-800);
+  border-color: var(--vsb-yellow-200);
+  box-shadow: var(--vsb-shadow-xs);
+}
+
+.vsb-badge-draft:hover {
+  background: linear-gradient(135deg, var(--vsb-yellow-200) 0%, var(--vsb-yellow-100) 100%);
+  border-color: var(--vsb-yellow-300);
+  box-shadow: var(--vsb-shadow-sm);
+  transform: translateY(-1px);
+}
+
+.vsb-badge-draft.vsb-badge-pulse {
+  animation: vsb-pulse-yellow var(--vsb-pulse-duration) cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes vsb-pulse-yellow {
+  0%, 100% {
+    box-shadow: var(--vsb-shadow-sm), var(--vsb-shadow-glow-warning);
+  }
+  50% {
+    box-shadow: var(--vsb-shadow-sm);
+  }
+}
+
+.vsb-badge-draft::before {
+  background: linear-gradient(135deg, var(--vsb-yellow-500) 0%, var(--vsb-yellow-700) 100%);
+}
+
+.vsb-badge-pending {
+  background: linear-gradient(135deg, var(--vsb-blue-100) 0%, var(--vsb-blue-50) 100%);
+  color: var(--vsb-blue-800);
+  border-color: var(--vsb-blue-200);
+  box-shadow: var(--vsb-shadow-xs);
+}
+
+.vsb-badge-pending:hover {
+  background: linear-gradient(135deg, var(--vsb-blue-200) 0%, var(--vsb-blue-100) 100%);
+  border-color: var(--vsb-blue-300);
+  box-shadow: var(--vsb-shadow-sm);
+  transform: translateY(-1px);
+}
+
+.vsb-badge-pending::before {
+  background: linear-gradient(135deg, var(--vsb-blue-500) 0%, var(--vsb-blue-700) 100%);
+}
+
+.vsb-badge-featured {
+  background: linear-gradient(135deg, var(--vsb-purple-100) 0%, var(--vsb-purple-50) 100%);
+  color: var(--vsb-purple-800);
+  border-color: var(--vsb-purple-200);
+  box-shadow: var(--vsb-shadow-xs);
+}
+
+.vsb-badge-featured:hover {
+  background: linear-gradient(135deg, var(--vsb-purple-200) 0%, var(--vsb-purple-100) 100%);
+  border-color: var(--vsb-purple-300);
+  box-shadow: var(--vsb-shadow-sm);
+  transform: translateY(-1px);
+}
+
+.vsb-badge-featured::before {
+  background: linear-gradient(135deg, var(--vsb-purple-500) 0%, var(--vsb-purple-700) 100%);
+}
+
+/* ===== BADGE ELEMENTS ===== */
+
+/* Icon Container */
+.vsb-badge-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.875rem;
+  height: 0.875rem;
+  transition: transform var(--vsb-transition-fast);
+}
+
+.vsb-badge:hover .vsb-badge-icon {
+  transform: scale(1.1);
+}
+
+/* Dot Indicator */
+.vsb-badge::before {
+  content: '';
+  position: absolute;
+  top: 0.25rem;
+  left: 0.25rem;
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  opacity: 0.8;
+  transition: all var(--vsb-transition-fast);
+}
+
+.vsb-badge:hover::before {
+  transform: scale(1.2);
+  opacity: 1;
+}
+
+/* Label */
+.vsb-badge-label {
+  letter-spacing: 0.01em;
+  font-weight: 600;
+  transition: all var(--vsb-transition-fast);
+}
+
+.vsb-badge:hover .vsb-badge-label {
+  letter-spacing: 0.02em;
+}
+
+/* Count Badge */
+.vsb-badge-count {
+  position: absolute;
+  top: -0.375rem;
+  right: -0.375rem;
+  min-width: 1rem;
+  height: 1rem;
+  padding: 0 0.25rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  line-height: 1;
+  color: white;
+  background: var(--vsb-gradient-success);
+  border: 1.5px solid white;
+  border-radius: var(--vsb-radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: vsb-count-bounce 0.5s var(--vsb-transition-bounce);
+  z-index: 10;
+}
+
+@keyframes vsb-count-bounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+/* ===== BADGE SIZES ===== */
+.vsb-badge-sm {
+  padding: 0.25rem 0.625rem;
+  font-size: 0.6875rem;
+  gap: 0.25rem;
+}
+
+.vsb-badge-sm .vsb-badge-icon {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.vsb-badge-sm::before {
+  width: 0.3125rem;
+  height: 0.3125rem;
+  top: 0.1875rem;
+  left: 0.1875rem;
+}
+
+.vsb-badge-lg {
+  padding: 0.5rem 1.125rem;
+  font-size: 0.875rem;
+  gap: 0.5rem;
+}
+
+.vsb-badge-lg .vsb-badge-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.vsb-badge-lg::before {
+  width: 0.5rem;
+  height: 0.5rem;
+  top: 0.375rem;
+  left: 0.375rem;
+}
+
+.vsb-badge-xl {
+  padding: 0.625rem 1.375rem;
+  font-size: 0.9375rem;
+  gap: 0.625rem;
+  font-weight: 600;
+}
+
+.vsb-badge-xl .vsb-badge-icon {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.vsb-badge-xl::before {
+  width: 0.625rem;
+  height: 0.625rem;
+  top: 0.4375rem;
+  left: 0.4375rem;
+}
+
+/* ===== BADGE STYLES ===== */
+
+/* Outline Style */
+.vsb-badge-outline {
+  background: transparent !important;
+  border-width: 1.5px;
+}
+
+.vsb-badge-outline.vsb-badge-active {
+  color: var(--vsb-green-700);
+  border-color: var(--vsb-green-400);
+}
+
+.vsb-badge-outline.vsb-badge-inactive {
+  color: var(--vsb-gray-700);
+  border-color: var(--vsb-gray-400);
+}
+
+.vsb-badge-outline.vsb-badge-out-of-stock {
+  color: var(--vsb-red-700);
+  border-color: var(--vsb-red-400);
+}
+
+.vsb-badge-outline.vsb-badge-draft {
+  color: var(--vsb-yellow-700);
+  border-color: var(--vsb-yellow-400);
+}
+
+.vsb-badge-outline.vsb-badge-pending {
+  color: var(--vsb-blue-700);
+  border-color: var(--vsb-blue-400);
+}
+
+.vsb-badge-outline.vsb-badge-featured {
+  color: var(--vsb-purple-700);
+  border-color: var(--vsb-purple-400);
+}
+
+/* Solid Style */
+.vsb-badge-solid {
+  color: white !important;
+  border: none !important;
+  box-shadow: var(--vsb-shadow-sm) !important;
+}
+
+.vsb-badge-solid.vsb-badge-active {
+  background: var(--vsb-gradient-success) !important;
+}
+
+.vsb-badge-solid.vsb-badge-inactive {
+  background: var(--vsb-gradient-neutral) !important;
+}
+
+.vsb-badge-solid.vsb-badge-out-of-stock {
+  background: var(--vsb-gradient-error) !important;
+}
+
+.vsb-badge-solid.vsb-badge-draft {
+  background: var(--vsb-gradient-warning) !important;
+}
+
+.vsb-badge-solid.vsb-badge-pending {
+  background: var(--vsb-gradient-info) !important;
+}
+
+.vsb-badge-solid.vsb-badge-featured {
+  background: var(--vsb-gradient-purple) !important;
+}
+
+.vsb-badge-solid:hover {
+  opacity: 0.95;
+  transform: translateY(-2px) !important;
+  box-shadow: var(--vsb-shadow-md) !important;
+}
+
+.vsb-badge-solid::before {
+  display: none;
+}
+
+/* Gradient Style */
+.vsb-badge-gradient {
+  position: relative;
+  color: white !important;
+  border: none !important;
+  overflow: hidden;
+}
+
+.vsb-badge-gradient::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--vsb-gradient-outline);
+  opacity: 0;
+  transition: opacity var(--vsb-transition-fast);
+}
+
+.vsb-badge-gradient:hover::after {
+  opacity: 1;
+}
+
+.vsb-badge-gradient.vsb-badge-active {
+  background: var(--vsb-gradient-success) !important;
+}
+
+.vsb-badge-gradient.vsb-badge-inactive {
+  background: var(--vsb-gradient-neutral) !important;
+}
+
+.vsb-badge-gradient.vsb-badge-out-of-stock {
+  background: var(--vsb-gradient-error) !important;
+}
+
+.vsb-badge-gradient.vsb-badge-draft {
+  background: var(--vsb-gradient-warning) !important;
+}
+
+.vsb-badge-gradient.vsb-badge-pending {
+  background: var(--vsb-gradient-info) !important;
+}
+
+.vsb-badge-gradient.vsb-badge-featured {
+  background: linear-gradient(135deg, var(--vsb-purple-500) 0%, var(--vsb-indigo-500) 100%) !important;
+}
+
+/* ===== ANIMATIONS ===== */
+.vsb-badge-pulse {
+  animation-iteration-count: infinite;
+}
+
+.vsb-badge-bounce {
+  animation: vsb-bounce 2s infinite;
+}
+
+@keyframes vsb-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.vsb-badge-shake {
+  animation: vsb-shake 0.5s;
+}
+
+@keyframes vsb-shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-2px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(2px);
+  }
+}
+
+/* ===== DARK MODE ===== */
+@media (prefers-color-scheme: dark) {
+  .vsb-badge-active {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.1) 100%);
+    color: var(--vsb-green-300);
+    border-color: rgba(34, 197, 94, 0.3);
+  }
+  
+  .vsb-badge-inactive {
+    background: linear-gradient(135deg, rgba(107, 114, 128, 0.2) 0%, rgba(107, 114, 128, 0.1) 100%);
+    color: var(--vsb-gray-300);
+    border-color: rgba(107, 114, 128, 0.3);
+  }
+  
+  .vsb-badge-out-of-stock {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.1) 100%);
+    color: var(--vsb-red-300);
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+  
+  .vsb-badge-draft {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.1) 100%);
+    color: var(--vsb-yellow-300);
+    border-color: rgba(245, 158, 11, 0.3);
+  }
+  
+  .vsb-badge-pending {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%);
+    color: var(--vsb-blue-300);
+    border-color: rgba(59, 130, 246, 0.3);
+  }
+  
+  .vsb-badge-featured {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(168, 85, 247, 0.1) 100%);
+    color: var(--vsb-purple-300);
+    border-color: rgba(168, 85, 247, 0.3);
+  }
+  
+  /* Outline Style - Dark Mode */
+  .vsb-badge-outline.vsb-badge-active {
+    color: var(--vsb-green-400);
+    border-color: var(--vsb-green-500);
+  }
+  
+  .vsb-badge-outline.vsb-badge-inactive {
+    color: var(--vsb-gray-400);
+    border-color: var(--vsb-gray-500);
+  }
+  
+  .vsb-badge-outline.vsb-badge-out-of-stock {
+    color: var(--vsb-red-400);
+    border-color: var(--vsb-red-500);
+  }
+  
+  .vsb-badge-outline.vsb-badge-draft {
+    color: var(--vsb-yellow-400);
+    border-color: var(--vsb-yellow-500);
+  }
+  
+  .vsb-badge-outline.vsb-badge-pending {
+    color: var(--vsb-blue-400);
+    border-color: var(--vsb-blue-500);
+  }
+  
+  .vsb-badge-outline.vsb-badge-featured {
+    color: var(--vsb-purple-400);
+    border-color: var(--vsb-purple-500);
+  }
+  
+  /* Solid Style - Dark Mode */
+  .vsb-badge-solid {
+    box-shadow: var(--vsb-shadow-md) !important;
+  }
+  
+  .vsb-badge-solid:hover {
+    box-shadow: var(--vsb-shadow-lg) !important;
+  }
+}
+
+/* ===== ACCESSIBILITY ===== */
+@media (prefers-reduced-motion: reduce) {
+  .vsb-badge,
+  .vsb-badge-icon,
+  .vsb-badge::before,
+  .vsb-badge-label,
+  .vsb-badge-count {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+.vsb-badge:focus-visible {
+  outline: 2px solid var(--vsb-blue-500);
+  outline-offset: 2px;
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  .vsb-badge {
+    background: white !important;
+    color: black !important;
+    border: 1px solid #000 !important;
+    box-shadow: none !important;
+    animation: none !important;
+  }
+  
+  .vsb-badge::before {
+    display: none !important;
+  }
+  
+  .vsb-badge-count {
+    background: black !important;
+    color: white !important;
+    border: 1px solid #000 !important;
+  }
+}
+
+/* ===== UTILITY CLASSES ===== */
+.vsb-inline-flex {
+  display: inline-flex;
+}
+
+.vsb-items-center {
+  align-items: center;
+}
+
+.vsb-px-2\.5 {
+  padding-left: 0.625rem;
+  padding-right: 0.625rem;
+}
+
+.vsb-py-0\.5 {
+  padding-top: 0.125rem;
+  padding-bottom: 0.125rem;
+}
+
+.vsb-rounded-full {
+  border-radius: var(--vsb-radius-full);
+}
+
+.vsb-text-xs {
+  font-size: 0.75rem;
+}
+
+.vsb-font-medium {
+  font-weight: 500;
+}
+
+/* Status Colors - Legacy Support */
+.vsb-bg-green-100 {
+  background-color: var(--vsb-green-100);
+}
+
+.vsb-text-green-800 {
+  color: var(--vsb-green-800);
+}
+
+.vsb-bg-gray-100 {
+  background-color: var(--vsb-gray-100);
+}
+
+.vsb-text-gray-800 {
+  color: var(--vsb-gray-800);
+}
+
+.vsb-bg-red-100 {
+  background-color: var(--vsb-red-100);
+}
+
+.vsb-text-red-800 {
+  color: var(--vsb-red-800);
+}
+
+/* Custom Scrollbar for Badge Groups */
+.vsb-scrollable::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.vsb-scrollable::-webkit-scrollbar-track {
+  background: var(--vsb-gray-100);
+  border-radius: var(--vsb-radius-full);
+}
+
+.vsb-scrollable::-webkit-scrollbar-thumb {
+  background: var(--vsb-gray-300);
+  border-radius: var(--vsb-radius-full);
+}
+
+.vsb-scrollable::-webkit-scrollbar-thumb:hover {
+  background: var(--vsb-gray-400);
+}
+
+@media (prefers-color-scheme: dark) {
+  .vsb-scrollable::-webkit-scrollbar-track {
+    background: var(--vsb-gray-800);
+  }
+  
+  .vsb-scrollable::-webkit-scrollbar-thumb {
+    background: var(--vsb-gray-600);
+  }
+  
+  .vsb-scrollable::-webkit-scrollbar-thumb:hover {
+    background: var(--vsb-gray-500);
+  }
+}
+
+/* Badge Group Layout */
+.vsb-badge-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.vsb-badge-group-stacked {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.vsb-badge-group-inline {
+  flex-direction: row;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}

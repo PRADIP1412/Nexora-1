@@ -29,7 +29,6 @@ def create_coupon_route(
 @router.get("", response_model=CouponListWrapper)
 def get_all_coupons_route(
     db: Session = Depends(get_db),
-    admin: User = Depends(is_admin),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000)
 ):

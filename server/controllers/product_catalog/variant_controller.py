@@ -109,3 +109,12 @@ class VariantController:
             raise e
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
+
+    async def get_variant_images(self, variant_id: int):
+        images = self.service.fetch_variant_images(variant_id)
+        return images
+
+
+    async def get_variant_videos(self, variant_id: int):
+        videos = self.service.fetch_variant_videos(variant_id)
+        return videos

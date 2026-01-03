@@ -24,6 +24,9 @@ import { BrandProvider } from "./context/BrandContext";
 import { CatalogProvider } from "./context/CatalogContext";
 import { AttributeProvider } from "./context/AttributeContext.jsx";
 
+// Import MediaProvider
+import { MediaProvider } from "./context/MediaContext";
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <AuthProvider>
@@ -44,6 +47,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                                 <BrandProvider>
                                   <AttributeProvider>
                                     <CatalogProvider>
+                                      {/* Add MediaProvider here if you want it globally available */}
+                                      {/* Or keep it scoped to the MediaPage route only */}
                                       <App />
                                     </CatalogProvider>
                                   </AttributeProvider>

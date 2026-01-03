@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useOffer } from '../../context/OfferContext';
+import { useOfferContext } from '../../context/OfferContext';
 import './OfferBadge.css';
 
 const OfferBadge = ({ variantId, showIcon = true, showText = true, size = 'medium' }) => {
-  const { getBestOfferForVariant, formatDiscountText } = useOffer();
+  const { getBestOfferForVariant, formatDiscountText } = useOfferContext();
   
   const bestOffer = getBestOfferForVariant(variantId);
   

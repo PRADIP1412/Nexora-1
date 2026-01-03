@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useAddress } from '../../context/AddressContext';
+import { useAddressContext } from '../../context/AddressContext';
 import { toastSuccess, toastError } from '../../utils/customToast';
 import './AddressSelector.css';
 
 const AddressSelector = ({ addresses, selectedAddress, onSelectAddress, onAddNewAddress }) => {
-  const { deleteAddress, setDefaultAddress, loading: addressLoading } = useAddress();
+  const { deleteAddress, setDefaultAddress, loading } = useAddressContext();
   const [processingAddress, setProcessingAddress] = useState(null);
 
   const handleDeleteAddress = async (addressId, e) => {
@@ -56,7 +56,7 @@ const AddressSelector = ({ addresses, selectedAddress, onSelectAddress, onAddNew
   };
 
   // Show loading state when addresses are being fetched
-  if (addressLoading.addresses) {
+  if (loading) {
     return (
       <div className="address-selector">
         <div className="address-list">
@@ -138,10 +138,10 @@ const AddressSelector = ({ addresses, selectedAddress, onSelectAddress, onAddNew
                   <button 
                     className="btn-set-default"
                     onClick={(e) => handleSetDefault(address.address_id, e)}
-                    disabled={processingAddress === address.address_id || addressLoading.delete}
+                    disabled={processingAddress === address.address_id || loading}
                     title="Set as default address"
                   >
-                    {processingAddress === address.address_id && addressLoading.update ? (
+                    {processingAddress === address.address_id && loading ? (
                       <i className="fas fa-spinner fa-spin"></i>
                     ) : (
                       <i className="fas fa-star"></i>
@@ -151,10 +151,10 @@ const AddressSelector = ({ addresses, selectedAddress, onSelectAddress, onAddNew
                 <button 
                   className="btn-delete-address"
                   onClick={(e) => handleDeleteAddress(address.address_id, e)}
-                  disabled={processingAddress === address.address_id || address.is_default || addressLoading.delete}
+                  disabled={processingAddress === address.address_id || address.is_default || loading}
                   title={address.is_default ? "Cannot delete default address" : "Delete address"}
                 >
-                  {processingAddress === address.address_id && addressLoading.delete ? (
+                  {processingAddress === address.address_id && loading ? (
                     <i className="fas fa-spinner fa-spin"></i>
                   ) : (
                     <i className="fas fa-trash"></i>
@@ -176,9 +176,9 @@ const AddressSelector = ({ addresses, selectedAddress, onSelectAddress, onAddNew
       <button 
         className="btn-add-address" 
         onClick={onAddNewAddress}
-        disabled={addressLoading.create}
+        disabled={loading}
       >
-        {addressLoading.create ? (
+        {loading ? (
           <>
             <i className="fas fa-spinner fa-spin"></i>
             Adding...

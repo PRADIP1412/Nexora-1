@@ -1,0 +1,369 @@
+.today-schedule {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 24px;
+}
+
+.schedule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f1f3f5;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-left h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.current-date {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.next-delivery {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.next-delivery-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.next-delivery-header h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.delivery-time {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: #6c757d;
+    background: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+}
+
+.delivery-details {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.delivery-id {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.delivery-id strong {
+    font-size: 18px;
+    color: #333;
+}
+
+.delivery-id span {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.delivery-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #495057;
+}
+
+.delivery-info svg {
+    color: #adb5bd;
+    flex-shrink: 0;
+}
+
+.delivery-distance {
+    font-size: 14px;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.no-next-delivery {
+    text-align: center;
+    padding: 20px;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.shifts-list h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 16px;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e9ecef;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.timeline-item:last-child {
+    margin-bottom: 0;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -30px;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+.timeline-item.shift .timeline-marker {
+    background: #f8f9fa;
+    border: 2px solid #3b82f6;
+}
+
+.timeline-item.break .timeline-marker {
+    background: #f8f9fa;
+    border: 2px solid #f59e0b;
+}
+
+.status-icon.ongoing {
+    color: #3b82f6;
+}
+
+.status-icon.completed {
+    color: #10b981;
+}
+
+.status-icon.upcoming {
+    color: #f59e0b;
+}
+
+.timeline-content {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 16px;
+    border: 1px solid #e9ecef;
+}
+
+.shift-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.shift-title {
+    flex: 1;
+}
+
+.shift-title strong {
+    display: block;
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.shift-time {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.shift-status {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+.shift-status.ongoing {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.shift-status.completed {
+    background: #dcfce7;
+    color: #059669;
+}
+
+.shift-status.upcoming {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.shift-location {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #6c757d;
+    margin-bottom: 12px;
+}
+
+.shift-location svg {
+    flex-shrink: 0;
+    color: #adb5bd;
+}
+
+.shift-progress {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e9ecef;
+}
+
+.shift-progress .progress-bar {
+    height: 6px;
+    background: #e9ecef;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.shift-progress .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.shift-progress .progress-text {
+    font-size: 13px;
+    color: #6c757d;
+}
+
+.shift-deliveries {
+    font-size: 14px;
+    color: #6c757d;
+    font-style: italic;
+    margin-top: 8px;
+}
+
+.no-shifts {
+    text-align: center;
+    padding: 40px;
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Loading states */
+.schedule-header.loading,
+.next-delivery.loading,
+.shifts-list.loading {
+    opacity: 0.8;
+}
+
+.loading-icon {
+    width: 20px;
+    height: 20px;
+    background: #e9ecef;
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+}
+
+.loading-icon.small {
+    width: 14px;
+    height: 14px;
+}
+
+.loading-line {
+    height: 12px;
+    background: #e9ecef;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    animation: pulse 1.5s infinite;
+}
+
+.loading-line.medium {
+    height: 18px;
+    width: 60%;
+}
+
+.loading-line.small {
+    height: 14px;
+    width: 40%;
+}
+
+.timeline-item.loading .timeline-marker {
+    background: #e9ecef;
+    border: none;
+}
+
+.timeline-item.loading .timeline-content {
+    background: #e9ecef;
+    border: none;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.no-data {
+    text-align: center;
+    padding: 40px;
+}
+
+.no-data p {
+    margin-bottom: 16px;
+    color: #6c757d;
+}
+
+.retry-btn {
+    padding: 10px 20px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.retry-btn:hover {
+    background: #2563eb;
+}

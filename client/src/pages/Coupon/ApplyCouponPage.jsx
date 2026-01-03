@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useCart } from '../../context/CartContext';
-import { useCoupon } from '../../context/CouponContext';
+import { useCartContext } from '../../context/CartContext';
+import { useCouponContext } from '../../context/CouponContext';
 import CouponCard from '../../components/Coupon/CouponCard';
 import ApplyCouponModal from '../../components/Coupon/ApplyCouponModal';
 import './ApplyCouponPage.css';
@@ -9,8 +9,8 @@ import './ApplyCouponPage.css';
 const ApplyCouponPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { cart } = useCart();
-  const { activeCoupons, validateCouponCode, isLoading } = useCoupon();
+  const { cart } = useCartContext();
+  const { activeCoupons, validateCouponCode, loading } = useCouponContext();
   
   const [selectedCoupon, setSelectedCoupon] = useState(null);
   const [appliedCoupon, setAppliedCoupon] = useState(null);
@@ -103,7 +103,7 @@ const ApplyCouponPage = () => {
               </div>
             </div>
 
-            {isLoading ? (
+            {loading ? (
               <div className="loading-coupons">
                 <div className="loading-spinner"></div>
                 <p>Loading available coupons...</p>

@@ -44,3 +44,26 @@ class ReviewController:
             raise e
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
+        # ADMIN: Fetch all reviews
+    def fetch_all_reviews(self, page: int = 1, per_page: int = 10):
+        return self.service.fetch_all_reviews(page, per_page)
+
+
+    # ADMIN: Update review status
+    def update_review_status(self, review_id: int, status: str):
+        return self.service.update_review_status(review_id, status)
+
+
+    # ADMIN: Add reply
+    def add_admin_reply(self, admin_id: int, review_id: int, body: str):
+        return self.service.add_admin_reply(admin_id, review_id, body)
+
+
+    # ADMIN: Delete reply
+    def delete_reply(self, reply_id: int):
+        return self.service.delete_reply(reply_id)
+
+
+    # ADMIN: Delete review forcefully
+    def admin_delete_review(self, review_id: int):
+        return self.service.admin_delete_review(review_id)

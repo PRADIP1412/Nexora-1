@@ -1,13 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useWishlist } from "../../context/WishlistContext";
+import { useWishlistContext } from "../../context/WishlistContext"; // Changed from useWishlist
 import { useAuth } from "../../context/AuthContext";
 import "./Wishlist.css";
 import { toast } from 'react-toastify';
 
 const Wishlist = () => {
   const navigate = useNavigate();
-  const { wishlist, removeItemFromWishlist, moveToCart, moveAllToCart, clearWishlist, isWishlistLoading, loadWishlist } = useWishlist();
+  const { 
+    wishlist, 
+    loading, // Changed from isWishlistLoading
+    removeItemFromWishlist, 
+    moveToCart, 
+    moveAllToCart, 
+    clearWishlist, 
+    loadWishlist 
+  } = useWishlistContext(); // Changed to useWishlistContext
   const { isAuthenticated } = useAuth();
   const [viewMode, setViewMode] = useState("grid");
   const [loadingActions, setLoadingActions] = useState(new Set());
@@ -157,7 +165,7 @@ const Wishlist = () => {
     );
   }
 
-  if (isWishlistLoading && (!wishlist || wishlist.length === 0)) {
+  if (loading && (!wishlist || wishlist.length === 0)) {
     return (
       <div className="wishlist-page">
         <div className="loading-container">

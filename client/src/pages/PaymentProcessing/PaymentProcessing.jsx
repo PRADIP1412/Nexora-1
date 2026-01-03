@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useCheckout } from '../../context/CheckoutContext';
-import { useOrder } from '../../context/OrderContext';
+import { useCheckoutContext } from '../../context/CheckoutContext';
+import { useOrderContext } from '../../context/OrderContext';
 import { toastSuccess, toastError, toastInfo } from '../../utils/customToast';
 import './PaymentProcessing.css';
 
@@ -13,8 +13,8 @@ const PaymentProcessing = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  const { selectedPayment, checkoutSummary, orderNotes, resetCheckout, verifiedAddress } = useCheckout();
-  const { createOrder, loading: orderLoading } = useOrder();
+  const { selectedPayment, checkoutSummary, orderNotes, resetCheckout, verifiedAddress } = useCheckoutContext();
+  const { createOrder, loading: orderLoading } = useOrderContext();
 
   useEffect(() => {
     console.log('PaymentProcessing Debug:', {

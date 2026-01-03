@@ -1,148 +1,314 @@
-// src/context/ProfileContext.jsx
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { profileAPI } from '../api/profile';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import * as profileApi from '../api/profile';
 import { useAuth } from './AuthContext';
 
 const ProfileContext = createContext();
 
-export const useProfile = () => {
+export const useProfileContext = () => {
     const context = useContext(ProfileContext);
     if (!context) {
-        throw new Error('useProfile must be used within a ProfileProvider');
+        throw new Error('useProfileContext must be used within ProfileProvider');
     }
     return context;
 };
 
 export const ProfileProvider = ({ children }) => {
+    // Auth context
     const { isAuthenticated, logout, user } = useAuth();
+    
+    // State
     const [profile, setProfile] = useState(null);
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [operationLogs, setOperationLogs] = useState([]);
 
+    // Check user roles
     const isAdminUser = !!(user && Array.isArray(user.roles) && user.roles.includes('admin'));
+    const isDeliveryUser = !!(user && Array.isArray(user.roles) && user.roles.includes('delivery'));
 
-    const fetchProfile = async () => {
-        // Skip customer profile fetch for admin
-        if (isAdminUser) {
-            console.log('Profile: Skipping profile fetch for admin user');
-            return;
+    // Utility function to add logs
+    const addLog = useCallback((message, type = 'info') => {
+        const log = {
+            message,
+            type,
+            timestamp: new Date().toLocaleTimeString()
+        };
+        setOperationLogs(prev => [log, ...prev.slice(0, 49)]); // Keep last 50 logs
+    }, []);
+
+    // Clear error
+    const clearError = useCallback(() => setError(null), []);
+
+    // Clear all data
+    const clearAllData = useCallback(() => {
+        setProfile(null);
+        setStats(null);
+        setOperationLogs([]);
+        setError(null);
+        addLog('All profile data cleared', 'info');
+    }, [addLog]);
+
+    // Clear operation logs
+    const clearOperationLogs = useCallback(() => {
+        setOperationLogs([]);
+        addLog('Profile operation logs cleared', 'info');
+    }, [addLog]);
+
+    // ===== FETCH PROFILE =====
+    const fetchProfile = useCallback(async () => {
+        // Skip for admin & delivery users
+        if (isAdminUser || isDeliveryUser) {
+            addLog('⚠️ Skipping profile fetch for non-customer role', 'warning');
+            return { success: false, message: 'Profile not available for admin/delivery users' };
         }
 
         if (!isAuthenticated) {
-            console.log('Profile: Skipping profile fetch - not authenticated');
-            return;
+            addLog('⚠️ User not authenticated, skipping profile fetch', 'warning');
+            return { success: false, message: 'User not authenticated' };
         }
 
         setLoading(true);
         setError(null);
+        addLog('Fetching profile...', 'info');
+        
         try {
-            console.log('Profile: Fetching profile data');
-            const response = await profileAPI.getProfile();
-            const data = response.data || response;
-            const payload = data?.data ?? data;
-
-            if (data?.success === true || payload) {
-                setProfile(payload);
-                console.log('Profile: Profile data loaded', payload);
+            const result = await profileApi.fetchProfile();
+            if (result.success) {
+                const profileData = result.data?.data ?? result.data;
+                setProfile(profileData);
+                addLog('✅ Profile fetched successfully', 'success');
+                return { success: true, data: profileData };
+            } else {
+                setError(result.message);
+                addLog(`❌ Failed to fetch profile: ${result.message}`, 'error');
+                return { success: false, message: result.message };
             }
         } catch (err) {
             const status = err.response?.status;
-            const errorMsg = err.response?.data?.detail || 'Failed to fetch profile';
-            setError(errorMsg);
-            console.error('Profile: Error fetching profile:', err);
+            let errorMsg = 'Failed to fetch profile';
 
-            // If it's an auth error, trigger logout for customers only
-            if (!isAdminUser && (status === 401 || status === 403)) {
-                console.log('Profile: Auth error detected for customer, logging out');
+            // Handle 401 error - logout
+            if (status === 401) {
+                errorMsg = 'Authentication failed';
+                addLog(`❌ ${errorMsg}, logging out...`, 'error');
                 logout();
-            } else {
-                console.warn('Profile: Fetch failed but not logging out (role or non-auth error).');
+                return { success: false, message: errorMsg };
             }
+
+            // Handle 404 error - logout as requested
+            if (status === 404) {
+                errorMsg = 'Profile endpoint not found';
+                addLog(`❌ ${errorMsg}, logging out...`, 'error');
+                logout();
+                return { success: false, message: errorMsg };
+            }
+
+            // Handle 403 error - skip profile for non-customer roles
+            if (status === 403) {
+                errorMsg = 'Profile not available for this user role';
+                addLog(`⚠️ ${errorMsg}`, 'warning');
+                return { success: false, message: errorMsg };
+            }
+
+            setError(errorMsg);
+            addLog(`❌ ${errorMsg}: ${err.message}`, 'error');
+            console.error('Fetch profile error:', err);
+            return { success: false, message: errorMsg };
         } finally {
             setLoading(false);
         }
-    };
+    }, [isAuthenticated, isAdminUser, isDeliveryUser, logout, addLog]);
 
-    const fetchStats = async () => {
-        // Skip stats fetch for admin users
-        if (isAdminUser) {
-            console.log('Profile: Skipping stats fetch for admin user');
-            return;
+    // ===== FETCH STATS =====
+    const fetchStats = useCallback(async () => {
+        // Skip for admin & delivery users
+        if (isAdminUser || isDeliveryUser) {
+            addLog('⚠️ Skipping stats fetch for non-customer role', 'warning');
+            return { success: false, message: 'Stats not available for admin/delivery users' };
         }
 
         if (!isAuthenticated) {
-            console.log('Profile: Skipping stats fetch - not authenticated');
-            return;
+            addLog('⚠️ User not authenticated, skipping stats fetch', 'warning');
+            return { success: false, message: 'User not authenticated' };
         }
 
+        setLoading(true);
+        setError(null);
+        addLog('Fetching profile statistics...', 'info');
+        
         try {
-            console.log('Profile: Fetching stats data');
-            const response = await profileAPI.getStats();
-            const data = response.data || response;
-            const payload = data?.data ?? data;
-
-            if (data?.success === true || payload) {
-                setStats(payload);
-                console.log('Profile: Stats data loaded', payload);
+            const result = await profileApi.fetchProfileStats();
+            if (result.success) {
+                const statsData = result.data?.data ?? result.data;
+                setStats(statsData);
+                addLog('✅ Profile statistics fetched successfully', 'success');
+                return { success: true, data: statsData };
+            } else {
+                setError(result.message);
+                addLog(`❌ Failed to fetch stats: ${result.message}`, 'error');
+                return { success: false, message: result.message };
             }
         } catch (err) {
             const status = err.response?.status;
-            console.error('Profile: Error fetching stats:', err);
+            let errorMsg = 'Failed to fetch profile statistics';
 
-            // For customer only: logout on auth errors
-            if (!isAdminUser && (status === 401 || status === 403)) {
-                console.log('Profile: Auth error detected in stats for customer, logging out');
+            // Handle 401 error - logout
+            if (status === 401) {
+                errorMsg = 'Authentication failed';
+                addLog(`❌ ${errorMsg}, logging out...`, 'error');
                 logout();
+                return { success: false, message: errorMsg };
+            }
+
+            // Handle 404 error - logout as requested
+            if (status === 404) {
+                errorMsg = 'Profile stats endpoint not found';
+                addLog(`❌ ${errorMsg}, logging out...`, 'error');
+                logout();
+                return { success: false, message: errorMsg };
+            }
+
+            // Handle 403 error - skip stats for non-customer roles
+            if (status === 403) {
+                errorMsg = 'Stats not available for this user role';
+                addLog(`⚠️ ${errorMsg}`, 'warning');
+                return { success: false, message: errorMsg };
+            }
+
+            setError(errorMsg);
+            addLog(`❌ ${errorMsg}: ${err.message}`, 'error');
+            console.error('Fetch stats error:', err);
+            return { success: false, message: errorMsg };
+        } finally {
+            setLoading(false);
+        }
+    }, [isAuthenticated, isAdminUser, isDeliveryUser, logout, addLog]);
+
+    // ===== UPDATE PROFILE =====
+    const updateProfile = useCallback(async (profileData) => {
+        // Skip for admin & delivery users
+        if (isAdminUser || isDeliveryUser) {
+            addLog('⚠️ Profile update not available for non-customer role', 'warning');
+            return { success: false, message: 'Profile update not available for admin/delivery users' };
+        }
+
+        if (!isAuthenticated) {
+            addLog('⚠️ User not authenticated, cannot update profile', 'warning');
+            return { success: false, message: 'User not authenticated' };
+        }
+
+        setLoading(true);
+        setError(null);
+        addLog('Updating profile...', 'info');
+        
+        try {
+            const result = await profileApi.updateProfile(profileData);
+            if (result.success) {
+                const updatedProfile = result.data?.data ?? result.data;
+                setProfile(updatedProfile);
+                addLog('✅ Profile updated successfully', 'success');
+                return { 
+                    success: true, 
+                    data: updatedProfile,
+                    message: result.message 
+                };
             } else {
-                console.warn('Profile: Stats fetch failed but not logging out (role or non-auth error).');
+                setError(result.message);
+                addLog(`❌ Failed to update profile: ${result.message}`, 'error');
+                return { success: false, message: result.message };
             }
-        }
-    };
-
-    const updateProfile = async (profileData) => {
-        setLoading(true);
-        setError(null);
-        try {
-            console.log('Profile: Updating profile data', profileData);
-            const response = await profileAPI.updateProfile(profileData);
-            const data = response.data || response;
-            const payload = data?.data ?? data;
-
-            if (data?.success === true || payload) {
-                setProfile(payload);
-                console.log('Profile: Profile updated successfully', payload);
-            }
-            return response;
         } catch (err) {
-            const errorMsg = err.response?.data?.detail || 'Failed to update profile';
+            const status = err.response?.status;
+            let errorMsg = 'Failed to update profile';
+
+            // Handle 401 error - logout
+            if (status === 401) {
+                errorMsg = 'Authentication failed';
+                addLog(`❌ ${errorMsg}, logging out...`, 'error');
+                logout();
+                return { success: false, message: errorMsg };
+            }
+
+            // Handle 404 error - logout as requested
+            if (status === 404) {
+                errorMsg = 'Update profile endpoint not found';
+                addLog(`❌ ${errorMsg}, logging out...`, 'error');
+                logout();
+                return { success: false, message: errorMsg };
+            }
+
+            // Handle 403 error
+            if (status === 403) {
+                errorMsg = 'Profile update not permitted for this user role';
+                addLog(`❌ ${errorMsg}`, 'error');
+                return { success: false, message: errorMsg };
+            }
+
             setError(errorMsg);
-            console.error('Profile: Error updating profile:', err);
-            throw new Error(errorMsg);
+            addLog(`❌ ${errorMsg}: ${err.message}`, 'error');
+            console.error('Update profile error:', err);
+            return { success: false, message: errorMsg };
         } finally {
             setLoading(false);
         }
-    };
+    }, [isAuthenticated, isAdminUser, isDeliveryUser, logout, addLog]);
 
-    const changePassword = async (passwordData) => {
+    // ===== CHANGE PASSWORD =====
+    const changePassword = useCallback(async (passwordData) => {
+        if (!isAuthenticated) {
+            addLog('⚠️ User not authenticated, cannot change password', 'warning');
+            return { success: false, message: 'User not authenticated' };
+        }
+
         setLoading(true);
         setError(null);
+        addLog('Changing password...', 'info');
+        
         try {
-            console.log('Profile: Changing password');
-            const response = await profileAPI.changePassword(passwordData);
-            console.log('Profile: Password changed successfully');
-            return response;
+            const result = await profileApi.changePassword(passwordData);
+            if (result.success) {
+                addLog('✅ Password changed successfully', 'success');
+                return { 
+                    success: true, 
+                    data: result.data,
+                    message: result.message 
+                };
+            } else {
+                setError(result.message);
+                addLog(`❌ Failed to change password: ${result.message}`, 'error');
+                return { success: false, message: result.message };
+            }
         } catch (err) {
-            const errorMsg = err.response?.data?.detail || 'Failed to change password';
+            const status = err.response?.status;
+            let errorMsg = 'Failed to change password';
+
+            // Handle 401 error - logout
+            if (status === 401) {
+                errorMsg = 'Authentication failed';
+                addLog(`❌ ${errorMsg}, logging out...`, 'error');
+                logout();
+                return { success: false, message: errorMsg };
+            }
+
+            // Handle 404 error - logout as requested
+            if (status === 404) {
+                errorMsg = 'Change password endpoint not found';
+                addLog(`❌ ${errorMsg}, logging out...`, 'error');
+                logout();
+                return { success: false, message: errorMsg };
+            }
+
             setError(errorMsg);
-            console.error('Profile: Error changing password:', err);
-            throw new Error(errorMsg);
+            addLog(`❌ ${errorMsg}: ${err.message}`, 'error');
+            console.error('Change password error:', err);
+            return { success: false, message: errorMsg };
         } finally {
             setLoading(false);
         }
-    };
+    }, [isAuthenticated, logout, addLog]);
 
-    // Fetch profile and stats when user authenticates
+    // ===== AUTO-FETCH PROFILE AND STATS =====
     useEffect(() => {
         if (isAuthenticated) {
             fetchProfile();
@@ -151,18 +317,35 @@ export const ProfileProvider = ({ children }) => {
             // Clear profile data when user logs out
             setProfile(null);
             setStats(null);
+            setOperationLogs([]);
+            setError(null);
+            addLog('User logged out, profile data cleared', 'info');
         }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, fetchProfile, fetchStats, addLog]);
 
     const value = {
+        // State
         profile,
         stats,
         loading,
         error,
+        operationLogs,
+        
+        // Profile Functions
         fetchProfile,
         fetchStats,
         updateProfile,
-        changePassword
+        changePassword,
+        
+        // Utility Functions
+        clearError,
+        clearAllData,
+        clearOperationLogs,
+        addLog,
+        
+        // User role info
+        isAdminUser,
+        isDeliveryUser
     };
 
     return (

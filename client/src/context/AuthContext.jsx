@@ -66,6 +66,14 @@ export const AuthProvider = ({ children }) => {
       return false;
     }
   };
+  const isDeliveryPerson = () => {
+    try {
+      const u = authUser || JSON.parse(localStorage.getItem(USER_KEY) || "null");
+      return !!(u && Array.isArray(u.roles) && u.roles.includes("delivery"));
+    } catch (e) {
+      return false;
+    }
+  };
 
   // Login: uses centralized api instance
   const login = async (email, password) => {
@@ -74,9 +82,7 @@ export const AuthProvider = ({ children }) => {
       const response = await api.post("/auth/login", { email, password });
       const data = response.data;
 
-      // Backend returns { success, message, access_token, user }
       if (!data || data.success !== true) {
-        console.error("Login failed response:", data);
         return { success: false, message: data?.message || "Login failed" };
       }
 
@@ -84,30 +90,35 @@ export const AuthProvider = ({ children }) => {
       const user = data.user || null;
 
       if (!token || !user) {
-        console.error("Login response missing token or user:", data);
         return { success: false, message: "Missing token or user in response" };
       }
 
       // Persist and set header immediately
       persistAuth(token, user);
 
-      // Redirect based on roles
-      const admin = (user.roles || []).includes("admin");
-      if (admin) {
+      // Get user roles
+      const userRoles = user.roles || [];
+      console.log("🔄 Login successful. User roles:", userRoles);
+
+      // FIXED: Use "delivery" (lowercase) to match database
+      if (userRoles.includes("admin")) {
+        console.log("🔐 Redirecting admin to /admin/dashboard");
         navigate("/admin/dashboard", { replace: true });
+      } else if (userRoles.includes("delivery")) { // Changed to "delivery"
+        console.log("🛵 Redirecting delivery person to /delivery/dashboard");
+        navigate("/delivery/dashboard", { replace: true });
       } else {
+        console.log("👤 Redirecting regular user to home");
         navigate("/", { replace: true });
       }
 
       return { success: true, data: { token, user } };
     } catch (error) {
       console.error("LOGIN ERROR:", error);
-
       let message = "Login failed. Please try again.";
       if (error.response?.data?.detail) message = error.response.data.detail;
       else if (error.response?.data?.message) message = error.response.data.message;
       else if (error.message) message = error.message;
-
       return { success: false, message };
     } finally {
       setIsLoading(false);

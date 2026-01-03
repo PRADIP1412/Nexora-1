@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useOrder } from '../../context/OrderContext';
+import { useOrderContext } from '../../context/OrderContext';
 import OrderTimeline from '../../components/Checkout/OrderTimeline';
 import { toastInfo } from '../../utils/customToast';
 import './TrackOrder.css';
 
 const TrackOrder = () => {
   const { orderId } = useParams();
-  const { getOrderById, currentOrder, loading, error } = useOrder();
+  const { fetchOrderById, currentOrder, loading, error } = useOrderContext();
 
   useEffect(() => {
     if (orderId) {
       console.log(`Fetching order with ID: ${orderId}`);
-      getOrderById(orderId);
+      fetchOrderById(orderId);
     }
-  }, [orderId, getOrderById]);
+  }, [orderId, fetchOrderById]);
 
   const handleShareTracking = () => {
     const trackingUrl = `${window.location.origin}/orders/${orderId}/track`;
@@ -26,8 +26,8 @@ const TrackOrder = () => {
     toastInfo('Opening carrier contact information');
   };
 
-  // Check if loading.order is true (specific to order fetching)
-  if (loading.order) {
+  // Check if loading is true
+  if (loading) {
     return (
       <div className="track-order-page">
         <div className="loading-container">
@@ -48,7 +48,7 @@ const TrackOrder = () => {
           <p>{error}</p>
           <button 
             className="btn-retry"
-            onClick={() => getOrderById(orderId)}
+            onClick={() => fetchOrderById(orderId)}
           >
             Retry
           </button>

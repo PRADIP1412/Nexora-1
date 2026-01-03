@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from config.dependencies import get_db, get_current_user
+from config.dependencies import get_db, get_current_user, is_admin
 from controllers.review_controller import ReviewController
 from schemas.review_schema import (
     ReviewCreate, ReviewWrapper, MessageWrapper, ReviewListWrapper  # ADD ReviewListWrapper
@@ -70,3 +70,50 @@ def remove_review(
         "message": result.get("message"), 
         "data": result
     }
+    # ADMIN: Fetch all reviews
+@router.get("/admin/all", dependencies=[Depends(is_admin)])
+def admin_fetch_all_reviews(
+    page: int = Query(1, ge=1),
+    per_page: int = Query(10, ge=1, le=100),
+    db: Session = Depends(get_db)
+):
+    controller = ReviewController(db)
+    data = controller.fetch_all_reviews(page, per_page)
+    return {"success": True, "message": "All reviews fetched", "data": data}
+
+
+# ADMIN: Update review status
+@router.put("/admin/{review_id}/status", dependencies=[Depends(is_admin)])
+def admin_update_review_status(review_id: int, status: str, db: Session = Depends(get_db)):
+    controller = ReviewController(db)
+    data = controller.update_review_status(review_id, status)
+    return {"success": True, "message": "Status updated", "data": data}
+
+
+# ADMIN: Add reply
+@router.post("/admin/{review_id}/reply", dependencies=[Depends(is_admin)])
+def admin_add_reply(
+    review_id: int,
+    body: str,
+    current_user = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    controller = ReviewController(db)
+    data = controller.add_admin_reply(current_user.user_id, review_id, body)
+    return {"success": True, "message": "Reply added", "data": data}
+
+
+# ADMIN: Delete reply
+@router.delete("/admin/reply/{reply_id}", dependencies=[Depends(is_admin)])
+def admin_delete_reply(reply_id: int, db: Session = Depends(get_db)):
+    controller = ReviewController(db)
+    data = controller.delete_reply(reply_id)
+    return {"success": True, "message": "Reply deleted", "data": data}
+
+
+# ADMIN: Delete any review
+@router.delete("/admin/{review_id}", dependencies=[Depends(is_admin)])
+def admin_delete_review(review_id: int, db: Session = Depends(get_db)):
+    controller = ReviewController(db)
+    data = controller.admin_delete_review(review_id)
+    return {"success": True, "message": "Review deleted", "data": data}

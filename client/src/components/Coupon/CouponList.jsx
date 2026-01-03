@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useCoupon } from '../../context/CouponContext';
+import { useCouponContext } from '../../context/CouponContext';
 import CouponCard from './CouponCard';
 import './CouponList.css';
 
 const CouponList = ({ coupons = [], isAdmin = false, onCouponAction, emptyMessage = 'No coupons available' }) => {
-  const { isLoading } = useCoupon();
+  const { loading } = useCouponContext();
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   
@@ -41,7 +41,7 @@ const CouponList = ({ coupons = [], isAdmin = false, onCouponAction, emptyMessag
     }
   };
   
-  if (isLoading && coupons.length === 0) {
+  if (loading && coupons.length === 0) {
     return (
       <div className="coupon-list-loading">
         <div className="loading-spinner"></div>

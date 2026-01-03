@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useCoupon } from '../../context/CouponContext';
+import { useCouponContext } from '../../context/CouponContext';
 import './ApplyCouponModal.css';
 
 const ApplyCouponModal = ({ isOpen, onClose, variantIds, orderTotal, onApply, appliedCoupon }) => {
@@ -9,8 +9,8 @@ const ApplyCouponModal = ({ isOpen, onClose, variantIds, orderTotal, onApply, ap
     validateCouponCode, 
     validationResult, 
     clearValidation,
-    isLoading 
-  } = useCoupon();
+    loading 
+  } = useCouponContext();
   
   const [couponCode, setCouponCode] = useState('');
   const [error, setError] = useState('');
@@ -118,14 +118,14 @@ const ApplyCouponModal = ({ isOpen, onClose, variantIds, orderTotal, onApply, ap
                     onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                     onKeyPress={handleKeyPress}
                     className="coupon-input"
-                    disabled={isLoading}
+                    disabled={loading}
                   />
                   <button 
                     className="validate-btn"
                     onClick={handleValidate}
-                    disabled={isLoading || !couponCode.trim()}
+                    disabled={loading || !couponCode.trim()}
                   >
-                    {isLoading ? (
+                    {loading ? (
                       <span className="loading-spinner"></span>
                     ) : (
                       <>

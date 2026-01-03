@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCart } from '../../context/CartContext';
+import { useCartContext } from '../../context/CartContext'; // Changed from useCart
 import { useAuth } from '../../context/AuthContext';
 import { 
   fetchNewArrivals, 
@@ -12,7 +12,7 @@ import './NewArrivalsPage.css';
 
 const NewArrivalsPage = () => {
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { addItemToCart } = useCartContext(); // Changed from addToCart to addItemToCart
   const { isAuthenticated } = useAuth();
   
   const [newArrivals, setNewArrivals] = useState([]);
@@ -267,16 +267,23 @@ const NewArrivalsPage = () => {
     return 'Recently added';
   };
 
-  const handleAddToCart = (product, productName) => {
+  const handleAddToCart = async (product, productName) => {
     if (!product || !product.default_variant) {
       console.error('Product data is incomplete:', product);
       return;
     }
 
     if (isAuthenticated) {
-      addToCart(product.default_variant.variant_id, 1);
-      // You can replace this with a proper notification system
-      alert(`Added ${productName} to cart!`);
+      try {
+        const result = await addItemToCart(product.default_variant.variant_id, 1);
+        if (result.success) {
+          alert(`Added ${productName} to cart!`);
+        } else {
+          alert(`Failed to add to cart: ${result.message}`);
+        }
+      } catch (error) {
+        alert('Error adding to cart. Please try again.');
+      }
     } else {
       navigate('/login', { state: { redirectTo: '/cart' } });
     }
@@ -286,15 +293,23 @@ const NewArrivalsPage = () => {
     navigate(`/products/${productId}`);
   };
 
-  const handleBuyNow = (product, productName) => {
+  const handleBuyNow = async (product, productName) => {
     if (!product || !product.default_variant) {
       console.error('Product data is incomplete:', product);
       return;
     }
 
     if (isAuthenticated) {
-      addToCart(product.default_variant.variant_id, 1);
-      navigate('/checkout');
+      try {
+        const result = await addItemToCart(product.default_variant.variant_id, 1);
+        if (result.success) {
+          navigate('/checkout');
+        } else {
+          alert(`Failed to add to cart: ${result.message}`);
+        }
+      } catch (error) {
+        alert('Error processing your request. Please try again.');
+      }
     } else {
       navigate('/login', { state: { redirectTo: '/checkout' } });
     }

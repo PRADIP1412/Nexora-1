@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useProfile } from '../../context/ProfileContext';
+import { useProfileContext } from '../../context/ProfileContext';
 import { toastSuccess, toastError, toastWarning, toastInfo } from '../../utils/customToast';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './Profile.css';
-import { toast } from 'react-toastify';
- 
+
 const Profile = () => {
     const navigate = useNavigate();
     const { logout, isAuthenticated } = useAuth();
-    const { profile, stats, loading, updateProfile, changePassword, fetchProfile } = useProfile();
+    const { profile, stats, loading, updateProfile, changePassword, fetchProfile } = useProfileContext();
     const [activeTab, setActiveTab] = useState('personal');
     const [isEditing, setIsEditing] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -227,12 +227,12 @@ const Profile = () => {
     };
 
     const handleQuickLinkClick = (path, name) => {
-        toastInfo(`Navigating to ${name}`);
+        toastInfo(`Navigating to ${name}`, toastConfig);
         navigate(path);
     };
 
     const handleStatCardClick = (path, name) => {
-        toastInfo(`Viewing ${name}`);
+        toastInfo(`Viewing ${name}`, toastConfig);
         navigate(path);
     };
 
@@ -373,7 +373,7 @@ const Profile = () => {
                         </div>
                     </div>
 
-                    <div className="stat-card" onClick={() => toastInfo(`Total spent: ₹${stats?.total_spent?.toLocaleString() || '0'}`)}>
+                    <div className="stat-card" onClick={() => toastInfo(`Total spent: ₹${stats?.total_spent?.toLocaleString() || '0'}`, toastConfig)}>
                         <div className="stat-icon spent">
                             <i className="fas fa-wallet"></i>
                         </div>
@@ -391,7 +391,7 @@ const Profile = () => {
                             className={`tab-btn ${activeTab === 'personal' ? 'active' : ''}`}
                             onClick={() => {
                                 setActiveTab('personal');
-                                toastInfo('Viewing personal information');
+                                toastInfo('Viewing personal information', toastConfig);
                             }}
                         >
                             <i className="fas fa-user"></i>
@@ -401,7 +401,7 @@ const Profile = () => {
                             className={`tab-btn ${activeTab === 'security' ? 'active' : ''}`}
                             onClick={() => {
                                 setActiveTab('security');
-                                toastInfo('Viewing security settings');
+                                toastInfo('Viewing security settings', toastConfig);
                             }}
                         >
                             <i className="fas fa-lock"></i>
@@ -514,7 +514,7 @@ const Profile = () => {
                                                 className="btn-change-password" 
                                                 onClick={() => {
                                                     setShowPasswordChange(true);
-                                                    toastInfo('You can now change your password');
+                                                    toastInfo('You can now change your password', toastConfig);
                                                 }}
                                             >
                                                 <i className="fas fa-key"></i>
@@ -577,7 +577,7 @@ const Profile = () => {
                                                             newPassword: '',
                                                             confirmPassword: ''
                                                         });
-                                                        toastInfo('Password change cancelled');
+                                                        toastInfo('Password change cancelled', toastConfig);
                                                     }}
                                                     disabled={saving}
                                                 >

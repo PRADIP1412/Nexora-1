@@ -2,11 +2,7 @@ import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1";
 const PRODUCTS_BASE_URL = `${API_URL}/products`;
-
-/* -----------------------------
-   ✅ EXISTING CUSTOMER FUNCTIONS (Keep these - DO NOT MODIFY)
------------------------------- */
-
+const REVIEWS_BASE_URL = `${API_URL}/reviews`;
 /* -----------------------------
    ✅ PRODUCT DETAILS API
 ------------------------------ */

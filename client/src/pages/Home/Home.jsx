@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { toastSuccess, toastError, toastWarning, toastInfo } from '../../utils/customToast';
 import "./Home.css";
 
+
 const Home = () => {
   const gradientColors = [
     'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -134,7 +135,7 @@ const Home = () => {
               {products.items.map((product, index) => {
                   // Safely destructure data from the default_variant nested object
                   const variant = product.default_variant;
-
+                  
                   return (
                     // In ProductsList.jsx and Home.jsx
                     <ProductCard

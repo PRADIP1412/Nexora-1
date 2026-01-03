@@ -17,18 +17,23 @@ const ProductsPage = () => {
     const [showProductForm, setShowProductForm] = useState(false);
     const [showVariants, setShowVariants] = useState(false);
     
-    // Set active tab based on URL when component mounts
+    // Handle URL-based tab switching
     useEffect(() => {
         const path = location.pathname;
+
         if (path.includes('/admin/categories')) {
             navigate('/admin/categories');
-        } else if (path.includes('/admin/brands')) {
+        } 
+        else if (path.includes('/admin/brands')) {
             navigate('/admin/brands');
-        } else if (path.includes('/admin/attributes')) {
+        } 
+        else if (path.includes('/admin/attributes')) {
             navigate('/admin/attributes');
-        } else if (path.includes('/admin/media')) {
-            navigate('/admin/media');
-        } else if (path.includes('/admin/reviews')) {
+        } 
+        else if (path.includes('/admin/variants')) {
+            navigate('/admin/variants');   // ✔ UPDATED
+        } 
+        else if (path.includes('/admin/reviews')) {
             navigate('/admin/reviews');
         }
     }, [location.pathname, navigate]);
@@ -71,43 +76,18 @@ const ProductsPage = () => {
     };
     
     // Navigation handlers
-    const handleNavigateToCategories = () => {
-        console.log("🔍 PAGE: Navigating to categories");
-        navigate('/admin/categories');
-    };
+    const handleNavigateToCategories = () => navigate('/admin/categories');
+    const handleNavigateToBrands = () => navigate('/admin/brands');
+    const handleNavigateToAttributes = () => navigate('/admin/attributes');
+    const handleNavigateToVariants = () => navigate('/admin/variants');   // ✔ NEW
+    const handleNavigateToReviews = () => navigate('/admin/reviews');
     
-    const handleNavigateToBrands = () => {
-        console.log("🔍 PAGE: Navigating to brands");
-        navigate('/admin/brands');
-    };
-    
-    const handleNavigateToAttributes = () => {
-        console.log("🔍 PAGE: Navigating to attributes");
-        navigate('/admin/attributes');
-    };
-    
-    const handleNavigateToMedia = () => {
-        console.log("🔍 PAGE: Navigating to media");
-        navigate('/admin/media');
-    };
-    
-    const handleNavigateToReviews = () => {
-        console.log("🔍 PAGE: Navigating to reviews");
-        navigate('/admin/reviews');
-    };
-    
-    // Handle escape key to close modals
+    // Handle ESC key closing modals
     useEffect(() => {
         const handleEscape = (e) => {
             if (e.key === 'Escape') {
-                if (showProductForm) {
-                    console.log("🔍 PAGE: Escape key pressed, closing form");
-                    handleFormCancel();
-                }
-                if (showVariants) {
-                    console.log("🔍 PAGE: Escape key pressed, closing variants");
-                    handleCloseVariants();
-                }
+                if (showProductForm) handleFormCancel();
+                if (showVariants) handleCloseVariants();
             }
         };
         
@@ -129,27 +109,22 @@ const ProductsPage = () => {
                                 Manage your products, variants, and inventory
                             </p>
                         </div>
+
                         <div className="header-actions">
                             <button 
-                                className="header-btn import-btn" 
-                                onClick={() => {
-                                    console.log("🔍 PAGE: Import clicked");
-                                    alert('Import functionality coming soon');
-                                }}
+                                className="header-btn import-btn"
+                                onClick={() => alert('Import coming soon')}
                             >
-                                <i className="fas fa-file-import"></i>
-                                Import
+                                <i className="fas fa-file-import"></i> Import
                             </button>
+
                             <button 
-                                className="header-btn export-btn" 
-                                onClick={() => {
-                                    console.log("🔍 PAGE: Export clicked");
-                                    alert('Export functionality coming soon');
-                                }}
+                                className="header-btn export-btn"
+                                onClick={() => alert('Export coming soon')}
                             >
-                                <i className="fas fa-file-export"></i>
-                                Export
+                                <i className="fas fa-file-export"></i> Export
                             </button>
+
                             <button className="header-btn add-btn" onClick={handleAddProduct}>
                                 <i className="fas fa-plus"></i>
                                 Add Product
@@ -157,133 +132,51 @@ const ProductsPage = () => {
                         </div>
                     </div>
                     
+                    {/* Navigation Tabs */}
                     <div className="navigation-tabs">
                         <button 
                             className={`nav-tab ${activeTab === 'list' ? 'active' : ''}`}
-                            onClick={() => {
-                                console.log("🔍 PAGE: Switching to list tab");
-                                setActiveTab('list');
-                            }}
+                            onClick={() => setActiveTab('list')}
                         >
                             <i className="fas fa-list"></i>
                             Product List
                         </button>
-                        <button 
-                            className={`nav-tab ${activeTab === 'categories' ? 'active' : ''}`}
-                            onClick={handleNavigateToCategories}
-                        >
+
+                        <button className="nav-tab" onClick={handleNavigateToCategories}>
                             <i className="fas fa-folder"></i>
                             Categories
                         </button>
-                        <button 
-                            className={`nav-tab ${activeTab === 'brands' ? 'active' : ''}`}
-                            onClick={handleNavigateToBrands}
-                        >
+
+                        <button className="nav-tab" onClick={handleNavigateToBrands}>
                             <i className="fas fa-tag"></i>
                             Brands
                         </button>
-                        <button 
-                            className={`nav-tab ${activeTab === 'attributes' ? 'active' : ''}`}
-                            onClick={handleNavigateToAttributes}
-                        >
+
+                        <button className="nav-tab" onClick={handleNavigateToAttributes}>
                             <i className="fas fa-sliders-h"></i>
                             Attributes
                         </button>
-                        <button 
-                            className={`nav-tab ${activeTab === 'media' ? 'active' : ''}`}
-                            onClick={handleNavigateToMedia}
-                        >
-                            <i className="fas fa-images"></i>
-                            Media
+
+                        {/* ✔ MEDIA removed — VARIANTS added */}
+                        <button className="nav-tab" onClick={handleNavigateToVariants}>
+                            <i className="fas fa-layer-group"></i>
+                            Variants
                         </button>
-                        <button 
-                            className={`nav-tab ${activeTab === 'reviews' ? 'active' : ''}`}
-                            onClick={handleNavigateToReviews}
-                        >
+
+                        <button className="nav-tab" onClick={handleNavigateToReviews}>
                             <i className="fas fa-star"></i>
                             Reviews
                         </button>
                     </div>
                     
+                    {/* Page Content */}
                     <div className="page-content">
                         {activeTab === 'list' && (
-                            <div className="tab-content active">
-                                <ProductList 
-                                    onEdit={handleEditProduct}
-                                    onViewVariants={handleViewVariants}
-                                    onAddProduct={handleAddProduct}
-                                />
-                            </div>
-                        )}
-                        
-                        {activeTab === 'categories' && (
-                            <div className="tab-content">
-                                <div className="coming-soon">
-                                    <i className="fas fa-folder-open"></i>
-                                    <h3>Categories Management</h3>
-                                    <p>Redirecting to Categories page...</p>
-                                    <button className="action-btn" onClick={() => setActiveTab('list')}>
-                                        <i className="fas fa-arrow-left"></i>
-                                        Back to Products
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                        
-                        {activeTab === 'brands' && (
-                            <div className="tab-content">
-                                <div className="coming-soon">
-                                    <i className="fas fa-tags"></i>
-                                    <h3>Brands Management</h3>
-                                    <p>Redirecting to Brands page...</p>
-                                    <button className="action-btn" onClick={() => setActiveTab('list')}>
-                                        <i className="fas fa-arrow-left"></i>
-                                        Back to Products
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                        
-                        {activeTab === 'attributes' && (
-                            <div className="tab-content">
-                                <div className="coming-soon">
-                                    <i className="fas fa-sliders-h"></i>
-                                    <h3>Attributes Management</h3>
-                                    <p>Redirecting to Attributes page...</p>
-                                    <button className="action-btn" onClick={() => setActiveTab('list')}>
-                                        <i className="fas fa-arrow-left"></i>
-                                        Back to Products
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                        
-                        {activeTab === 'media' && (
-                            <div className="tab-content">
-                                <div className="coming-soon">
-                                    <i className="fas fa-images"></i>
-                                    <h3>Media Library</h3>
-                                    <p>Redirecting to Media page...</p>
-                                    <button className="action-btn" onClick={() => setActiveTab('list')}>
-                                        <i className="fas fa-arrow-left"></i>
-                                        Back to Products
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                        
-                        {activeTab === 'reviews' && (
-                            <div className="tab-content">
-                                <div className="coming-soon">
-                                    <i className="fas fa-star"></i>
-                                    <h3>Product Reviews</h3>
-                                    <p>Redirecting to Reviews page...</p>
-                                    <button className="action-btn" onClick={() => setActiveTab('list')}>
-                                        <i className="fas fa-arrow-left"></i>
-                                        Back to Products
-                                    </button>
-                                </div>
-                            </div>
+                            <ProductList 
+                                onEdit={handleEditProduct}
+                                onViewVariants={handleViewVariants}
+                                onAddProduct={handleAddProduct}
+                            />
                         )}
                     </div>
                     
@@ -304,6 +197,7 @@ const ProductsPage = () => {
                     {showVariants && selectedProduct && (
                         <div className="modal-overlay active" onClick={handleCloseVariants}>
                             <div className="modal-content variants-modal" onClick={(e) => e.stopPropagation()}>
+                                
                                 <div className="variants-modal-header">
                                     <h2>
                                         <i className="fas fa-layer-group"></i>
@@ -313,19 +207,18 @@ const ProductsPage = () => {
                                         <i className="fas fa-times"></i>
                                     </button>
                                 </div>
+
                                 <div className="variants-modal-body">
                                     <ProductVariants productId={selectedProduct} />
+                                    
                                     <div className="variants-modal-actions">
-                                        <button 
-                                            className="btn btn-secondary"
-                                            onClick={handleCloseVariants}
-                                        >
+                                        <button className="btn btn-secondary" onClick={handleCloseVariants}>
                                             Close
                                         </button>
+
                                         <button 
                                             className="btn btn-primary"
                                             onClick={() => {
-                                                console.log("🔍 PAGE: Switching from variants to edit product");
                                                 handleCloseVariants();
                                                 handleEditProduct(selectedProduct);
                                             }}
@@ -338,6 +231,7 @@ const ProductsPage = () => {
                             </div>
                         </div>
                     )}
+
                 </div>
             </CategoryProvider>
         </ProductProvider>

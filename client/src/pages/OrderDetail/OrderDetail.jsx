@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useOrder } from '../../context/OrderContext';
+import { useOrderContext } from '../../context/OrderContext';
 import OrderStatusBadge from '../../components/Orders/OrderStatusBadge';
 import OrderTimeline from '../../components/Checkout/OrderTimeline';
 import CancelOrderModal from '../../components/Orders/CancelOrderModal';
@@ -15,7 +15,7 @@ const OrderDetail = () => {
   const [showReturnModal, setShowReturnModal] = useState(false);
   const [orderError, setOrderError] = useState(null); // Add local error state
   
-  const { getOrderById, currentOrder, cancelOrder, createReturnRequest, loading } = useOrder();
+  const { fetchOrderById, currentOrder, cancelOrder, createReturnRequest, loading } = useOrderContext();
 
   useEffect(() => {
     if (orderId) {
@@ -38,14 +38,14 @@ const OrderDetail = () => {
         numericOrderId = parseInt(numericOrderId, 10);
       }
       
-      getOrderById(numericOrderId).then(result => {
+      fetchOrderById(numericOrderId).then(result => {
         if (!result.success) {
           setOrderError(result.message);
           toastError(`Failed to load order: ${result.message}`);
         }
       });
     }
-  }, [orderId, getOrderById]);
+  }, [orderId, fetchOrderById]);
 
   const handleDownloadInvoice = () => {
     toastSuccess('Invoice download started');
@@ -75,7 +75,7 @@ const OrderDetail = () => {
     }
   };
 
-  if (loading.order) {
+  if (loading) {
     return (
       <div className="order-detail-page">
         <div className="order-detail-container">

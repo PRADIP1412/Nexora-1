@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useCoupon } from '../../context/CouponContext';
+import { useCouponContext } from '../../context/CouponContext';
 import './CouponCard.css';
 
 const CouponCard = ({ coupon, isAdmin = false, onAction, showActions = true }) => {
-  const { formatDiscountText } = useCoupon();
+  const { formatDiscountText } = useCouponContext();
   
   const now = new Date();
   const startDate = new Date(coupon.start_date);

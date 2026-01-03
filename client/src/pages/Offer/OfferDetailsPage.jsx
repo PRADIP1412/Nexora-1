@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useOffer } from '../../context/OfferContext';
-import { useCart } from '../../context/CartContext';
+import { useOfferContext } from '../../context/OfferContext';
+import { useCartContext } from '../../context/CartContext';
 import OfferCard from '../../components/Offer/OfferCard';
 import OfferBadge from '../../components/Offer/OfferBadge';
 import './OfferDetailsPage.css';
@@ -9,8 +9,8 @@ import './OfferDetailsPage.css';
 const OfferDetailsPage = () => {
   const { offerId } = useParams();
   const navigate = useNavigate();
-  const { loadOfferById, selectedOffer, isLoading, error, getOffersForVariant } = useOffer();
-  const { cart, addItemToCart } = useCart();
+  const { fetchOfferById, selectedOffer, loading, error, getOffersForVariant } = useOfferContext();
+  const { cart, addItemToCart } = useCartContext();
   
   const [products, setProducts] = useState([]);
   const [relatedOffers, setRelatedOffers] = useState([]);
@@ -18,9 +18,9 @@ const OfferDetailsPage = () => {
 
   useEffect(() => {
     if (offerId) {
-      loadOfferById(parseInt(offerId));
+      fetchOfferById(parseInt(offerId));
     }
-  }, [offerId, loadOfferById]);
+  }, [offerId, fetchOfferById]);
 
   useEffect(() => {
     if (selectedOffer) {
@@ -74,7 +74,7 @@ const OfferDetailsPage = () => {
     });
   };
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="offer-details-loading">
         <div className="loading-spinner-large"></div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useOrder } from '../../context/OrderContext';
+import { useOrderContext } from '../../context/OrderContext';
 import OrderCard from '../../components/Orders/OrderCard';
 import { toastInfo, toastError } from '../../utils/customToast';
 import './Orders.css';
@@ -12,14 +12,14 @@ const Orders = () => {
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
   
-  const { orders, getUserOrders, loading, error } = useOrder();
+  const { orders, fetchUserOrders, loading, error } = useOrderContext();
 
   useEffect(() => {
     loadOrders(1);
   }, []);
 
   const loadOrders = async (pageNum = 1, append = false) => {
-    const result = await getUserOrders(pageNum, 10, activeFilter === 'all' ? null : activeFilter);
+    const result = await fetchUserOrders(pageNum, 10, activeFilter === 'all' ? null : activeFilter);
     if (result.success) {
       setHasMore(result.pagination?.has_next || false);
       setPage(pageNum);
@@ -72,7 +72,7 @@ const Orders = () => {
     loadOrders(page + 1, true);
   };
 
-  if (loading.orders && orders.length === 0) {
+  if (loading && orders.length === 0) {
     return (
       <div className="orders-page">
         <div className="orders-container">
@@ -184,9 +184,9 @@ const Orders = () => {
                   <button 
                     className="btn-load-more"
                     onClick={handleLoadMore}
-                    disabled={loading.orders}
+                    disabled={loading}
                   >
-                    {loading.orders ? (
+                    {loading ? (
                       <>
                         <i className="fas fa-spinner fa-spin"></i>
                         Loading...

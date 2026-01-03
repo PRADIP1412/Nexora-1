@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './Navbar.css';
 import { useAuth } from '../../context/AuthContext';
-import { useWishlist } from '../../context/WishlistContext';
+import { useWishlistContext } from '../../context/WishlistContext';
 import { fetchSuggestions } from '../../api/product';
-import { useCart } from '../../context/CartContext';
+import { useCartContext } from '../../context/CartContext';
 
 // Import Notification Components
 import NotificationBell from '../Notification/NotificationBell';
@@ -13,8 +13,8 @@ import NotificationDropdown from '../Notification/NotificationDropdown';
 const Navbar = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
-  const { wishlist } = useWishlist();
-  const { getCartItemCount } = useCart();
+  const { wishlist } = useWishlistContext();
+  const { getCartItemCount } = useCartContext();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
