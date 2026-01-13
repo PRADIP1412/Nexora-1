@@ -2,6 +2,15 @@ from pydantic import BaseModel, EmailStr, ConfigDict
 from typing import Optional, List
 from datetime import datetime
 
+class UserData(BaseModel):
+    user_id: int
+    username: str
+    email: EmailStr
+    first_name: str
+    last_name: str
+    phone: Optional[str]
+    roles: List[str]
+
 # --- Authentication Schemas ---
 class UserLogin(BaseModel):
     email: EmailStr
@@ -36,21 +45,14 @@ class LoginResponse(BaseModel):
     success: bool
     message: str
     access_token: Optional[str] = None
-    user: Optional[UserData] = None
+    user: Optional["UserData"] = None
 
 class RegisterResponse(BaseModel):
     status: bool = True
     message: str = "User Registered Successfully"
     user: UserData
 
-class UserData(BaseModel):
-    user_id: int
-    username: str
-    email: EmailStr
-    first_name: str
-    last_name: str
-    phone: Optional[str]
-    roles: List[str]
+
 # --- Utility Schemas (Keep existing ones) ---
 class UserDetail(BaseModel):
     user_id: int
