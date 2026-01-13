@@ -1,3 +1,4 @@
+from __future__ import annotations
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from repositories.product_catalog.variant_repository import VariantRepository

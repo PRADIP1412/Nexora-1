@@ -1,3 +1,4 @@
+from __future__ import annotations
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from repositories.inventory.company_repository import CompanyRepository
