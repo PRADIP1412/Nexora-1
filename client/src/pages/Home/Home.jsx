@@ -8,7 +8,15 @@ import { toastSuccess, toastError, toastWarning, toastInfo } from '../../utils/c
 import "./Home.css";
 
 
+
+
 const Home = () => {
+
+  
+
+
+
+
   const gradientColors = [
     'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
     'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
@@ -160,6 +168,9 @@ const Home = () => {
 
 
   return (
+
+
+  
     <div className="home-page">
       <main className="main-content">
         {/* Hero Section */}
@@ -303,6 +314,7 @@ const Home = () => {
         </section>
       </main>
     </div>
+    
   );
 };
 
