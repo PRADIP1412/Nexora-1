@@ -161,24 +161,13 @@ const Navbar = () => {
       <div className="navbar-top">
         <div className="nav-container">
           <div className="nav-logo" onClick={() => navigate('/')}>
-            <i className="fas fa-shopping-bag"></i>
+            
             <h1>Nexora</h1>
           </div>
 
           {/* Search */}
           <div className="nav-search-wrapper" ref={searchBoxRef}>
             <form className="nav-search" onSubmit={handleSearch}>
-              <select
-                className="search-category"
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-              >
-                <option>All</option>
-                <option>Electronics</option>
-                <option>Fashion</option>
-                <option>Home & Kitchen</option>
-                <option>Books</option>
-              </select>
               <input
                 type="text"
                 className="search-input"
@@ -253,12 +242,11 @@ const Navbar = () => {
                 <Link to="/wishlist" className="nav-link">
                   <i className="far fa-heart"></i>
                   <span>Wishlist</span>
-                  {wishlist.length > 0 && <span className="badge">{wishlist.length}</span>}
+                  
                 </Link>
                 <button onClick={() => navigate('/cart')} className="nav-link">
                   <i className="fas fa-shopping-cart"></i>
                   <span>Cart</span>
-                  {cartCount > 0 && <span className="badge">{cartCount}</span>}
                 </button>
                 <button onClick={handleLogout} className="nav-link">
                   <i className="fas fa-sign-out-alt"></i>

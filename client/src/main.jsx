@@ -6,6 +6,7 @@ import { BrowserRouter } from "react-router-dom";
 
 
 import "./assets/clash-display.css";
+import "./assets/mooxy.css";
 
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { NotificationProvider } from "./context/NotificationContext.jsx";
