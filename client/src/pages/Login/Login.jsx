@@ -78,9 +78,8 @@
 
                         <div className="login">
                             <div className="form-header-login">
-                                <h2 className="display-text">Log In</h2>
                                 {apiError && (
-                                    <div className="error-message api-error">
+                                    <div className="login-error-message api-error">
                                         <i className="fas fa-exclamation-circle"></i> {apiError}
                                     </div>
                                 )}
@@ -90,7 +89,6 @@
                                 
                                 {/* Email */}
                                 <div className="inputs">
-                                    <label htmlFor="email">Email Address</label>
                                     <div className="inputs-wrapper">
                                         <i className="fas fa-envelope input-icon"></i>
                                         <input
@@ -99,13 +97,13 @@
                                             name="email"
                                             value={formData.email}
                                             onChange={handleChange}
-                                            placeholder="johndoe@example.com"
+                                            placeholder="Email Address"
                                             className={errors.email ? "error" : ""}
                                             disabled={isLoading}
                                         />
                                     </div>
                                     {errors.email && (
-                                        <span className="error-message">
+                                        <span className="login-error-message">
                                             <i className="fas fa-exclamation-triangle"></i> {errors.email}
                                         </span>
                                     )}
@@ -113,7 +111,6 @@
 
                                 {/* Password */}
                                 <div className="inputs">
-                                    <label htmlFor="password">Password</label>
                                     <div className="inputs-wrapper">
                                         <i className="fas fa-lock input-icon"></i>
                                         <input
@@ -135,7 +132,7 @@
                                         </span>
                                     </div>
                                     {errors.password && (
-                                        <span className="error-message">
+                                        <span className="login-error-message">
                                             <i className="fas fa-exclamation-triangle"></i> {errors.password}
                                         </span>
                                     )}
@@ -144,7 +141,7 @@
                                 {/* Login Button */}
                                 <button 
                                     type="submit"
-                                    className="btn-submit"
+                                    className="wishlist-btn-submit"
                                     disabled={isLoading}
                                 >
                                     {isLoading ? (
@@ -161,9 +158,9 @@
                                 </button>
                             </form>
 
-                            <p className="auth-switch">
+                            <p className="login-auth-switch">
                                 Don't have an account?{" "}
-                                <Link to="/signup" className="auth-link">Create Account</Link>
+                                <Link to="/signup" className="login-auth-link">Create Account</Link>
                             </p>
 
                         </div>

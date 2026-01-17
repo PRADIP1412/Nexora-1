@@ -258,7 +258,7 @@ const WishlistItem = ({ item, onRemove, onAddToCart, viewMode, navigate, loading
         <h3 onClick={handleProductClick} style={{ cursor: 'pointer' }}>
           {product_name} {variant_name && variant_name !== 'Default' && `(${variant_name})`}
         </h3>
-        <p className="item-price">₹{price?.toLocaleString() || '0'}</p>
+        <p className="wishlist-item-price">₹{price?.toLocaleString() || '0'}</p>
         <p className="wishlist-date">Added on {new Date(added_at).toLocaleDateString()}</p>
       </div>
 
@@ -272,7 +272,7 @@ const WishlistItem = ({ item, onRemove, onAddToCart, viewMode, navigate, loading
           {isMovingToCart ? 'Moving...' : 'Move to Cart'}
         </button>
         <button 
-          className="btn-remove" 
+          className="wishlist-btn-remove" 
           onClick={() => onRemove(variant_id)}
           disabled={isRemoving}
         >
@@ -303,7 +303,7 @@ const WishlistItem = ({ item, onRemove, onAddToCart, viewMode, navigate, loading
           {isMovingToCart ? 'Moving...' : 'Move to Cart'}
         </button>
         <button 
-          className="btn-remove-list" 
+          className="wishlist-btn-remove-list" 
           onClick={() => onRemove(variant_id)}
           disabled={isRemoving}
         >

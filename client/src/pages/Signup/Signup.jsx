@@ -160,8 +160,6 @@ const Signup = () => {
             
             <div className="signup">
                 <div className="form-header-signup">
-                    <h2 className="header-text">Create Account</h2>
-                    <p className="form-description">Fill in your details to create a new account</p>
                     {apiError && (
                         <div className="error-message api-error">
                             <i className="fas fa-exclamation-circle"></i> {apiError}
@@ -173,7 +171,6 @@ const Signup = () => {
                     
                     {/* Username */}
                     <div className="input">
-                        <label htmlFor="username">Username *</label>
                         <div className="input-wrapper">
                             <i className="fas fa-user input-icon"></i>
                             <input
@@ -182,7 +179,7 @@ const Signup = () => {
                                 name="username"
                                 value={formData.username}
                                 onChange={handleChange}
-                                placeholder="johndoe"
+                                placeholder="Username"
                                 className={errors.username ? "error" : ""}
                                 disabled={isLoading}
                                 maxLength={50}
@@ -197,7 +194,6 @@ const Signup = () => {
 
                     {/* Email */}
                     <div className="input">
-                        <label htmlFor="email">Email Address *</label>
                         <div className="input-wrapper">
                             <i className="fas fa-envelope input-icon"></i>
                             <input
@@ -206,7 +202,7 @@ const Signup = () => {
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                placeholder="johndoe@example.com"
+                                placeholder="Email Address"
                                 className={errors.email ? "error" : ""}
                                 disabled={isLoading}
                             />
@@ -220,7 +216,6 @@ const Signup = () => {
 
                     {/* Password */}
                     <div className="input">
-                        <label htmlFor="password">Password *</label>
                         <div className="input-wrapper">
                             <i className="fas fa-lock input-icon"></i>
                             <input
@@ -229,7 +224,7 @@ const Signup = () => {
                                 name="password"
                                 value={formData.password}
                                 onChange={handleChange}
-                                placeholder="Create a strong password"
+                                placeholder="Password"
                                 className={errors.password ? "error" : ""}
                                 disabled={isLoading}
                             />
