@@ -12,7 +12,7 @@ import NotificationDropdown from '../Notification/NotificationDropdown';
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, isAdmin, isDeliveryPerson } = useAuth();
   const { wishlist } = useWishlistContext();
   const { getCartItemCount } = useCartContext();
 
@@ -82,7 +82,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate('/login');
   };
 
   const scrollCategories = (direction) => {
@@ -160,7 +160,7 @@ const Navbar = () => {
       {/* ===== Top Bar ===== */}
       <div className="navbar-top">
         <div className="nav-container">
-          <div className="nav-logo" onClick={() => navigate('/')}>
+          <div className="nav-logo" onClick={() => navigate('/home')}>
             
             <h1>Nexora</h1>
           </div>

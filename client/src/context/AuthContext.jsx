@@ -109,7 +109,7 @@ export const AuthProvider = ({ children }) => {
         navigate("/delivery/dashboard", { replace: true });
       } else {
         console.log("👤 Redirecting regular user to home");
-        navigate("/", { replace: true });
+        navigate("/home", { replace: true });
       }
 
       return { success: true, data: { token, user } };
@@ -165,6 +165,7 @@ export const AuthProvider = ({ children }) => {
         user: authUser,
         isAuthenticated: !!authUser,
         isAdmin,
+        isDeliveryPerson,
         serverStatus,
         setServerStatus,
         login,

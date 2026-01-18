@@ -216,7 +216,7 @@ const Cart = () => {
                     <i className="fas fa-shopping-cart"></i>
                     <h2>Your cart is empty</h2>
                     <p>Add items to your cart to see them here</p>
-                    <button className="continue-shopping-btn" onClick={() => navigate('/')}>
+                    <button className="continue-shopping-btn" onClick={() => navigate('/home')}>
                         Continue Shopping
                     </button>
                 </div>
@@ -478,7 +478,7 @@ const Cart = () => {
                             Proceed to Checkout
                         </button>
 
-                        <button className="continue-shopping-btn-summary" onClick={() => navigate('/')}>
+                        <button className="continue-shopping-btn-summary" onClick={() => navigate('/home')}>
                             <i className="fas fa-arrow-left"></i>
                             Continue Shopping
                         </button>

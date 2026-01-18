@@ -27,7 +27,7 @@ const DeliveryRoute = ({ children }) => {
     
     if (!isDeliveryPerson) {
         console.log('❌ Not a delivery person, redirecting to home');
-        return <Navigate to="/" replace />;
+        return <Navigate to="/home" replace />;
     }
 
     console.log('✅ Delivery person access granted');

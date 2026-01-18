@@ -113,7 +113,7 @@ const OfferDetailsPage = () => {
     <div className="offer-details-page">
       <div className="container">
         <div className="breadcrumb">
-          <Link to="/">Home</Link>
+          <Link to="/home">Home</Link>
           <i className="fas fa-chevron-right"></i>
           <Link to="/offers">Offers</Link>
           <i className="fas fa-chevron-right"></i>

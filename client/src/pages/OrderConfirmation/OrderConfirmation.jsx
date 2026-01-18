@@ -66,7 +66,7 @@ const OrderConfirmation = () => {
   };
 
   const handleContinueShopping = () => {
-    navigate('/');
+    navigate('/home');
   };
 
   const handleDownloadInvoice = () => {

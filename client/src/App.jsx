@@ -76,6 +76,7 @@ import { AvailableDeliveriesProvider } from './context/delivery_panel/AvailableD
 import { DeliveryReportsProvider } from './context/delivery_panel/DeliveryReportsContext';
 
 import DebugPage from './pages/Debug/DebugPage';
+import LandingPage from './pages/LandingPage/LandingPage';
 
 function App() {
   return (
@@ -118,12 +119,20 @@ function App() {
             </ProtectedRoute>
           }
         />
-
+        <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <LandingPage />
+              </ProtectedRoute>
+            }
+        />  
         {/* ==================== REGULAR USER ROUTES ==================== */}
         {/* Layout Wrapper */}
         <Route element={<Layout />}>
+          
           <Route
-            path="/"
+            path="/home"
             element={
               <ProtectedRoute>
                 <Home />

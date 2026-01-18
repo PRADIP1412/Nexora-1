@@ -214,7 +214,7 @@ const DeliverySidebar = ({ isOpen, isMobile, closeSidebar }) => {
   };
 
   const handleGoToHome = () => {
-    navigate('/');
+    navigate('/home');
     if (isMobile) {
       closeSidebar();
     }

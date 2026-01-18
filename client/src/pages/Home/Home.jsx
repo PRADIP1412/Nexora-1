@@ -170,6 +170,21 @@ const Home = () => {
   return (
 
 
+    <div className="home-bg-wrapper">
+    {/* Background video */}
+    <video
+      className="home-bg-video"
+      src="./home-bg-video.mp4"
+      autoPlay
+      loop
+      muted
+      playsInline
+    />
+
+    {/* Optional overlay */}
+    <div className="home-bg-overlay" />
+
+
   
     <div className="home-page">
       <main className="main-content">
@@ -313,6 +328,7 @@ const Home = () => {
           </div>
         </section>
       </main>
+    </div>
     </div>
     
   );

@@ -202,7 +202,7 @@ const NotificationPage = () => {
                   <p>When you have notifications, they'll appear here</p>
                   <button 
                     className="browse-btn"
-                    onClick={() => window.location.href = '/'}
+                    onClick={() => window.location.href = '/home'}
                   >
                     Start Shopping
                   </button>

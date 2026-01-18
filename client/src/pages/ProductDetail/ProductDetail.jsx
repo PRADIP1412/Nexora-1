@@ -290,7 +290,7 @@ const ProductDetail = () => {
                 <div className="error-container">
                     <i className="fas fa-exclamation-circle"></i>
                     <h2>Product not found</h2>
-                    <button onClick={() => navigate('/')}>Go to Home</button>
+                    <button onClick={() => navigate('/home')}>Go to Home</button>
                 </div>
             </div>
         );
